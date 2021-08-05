@@ -21,7 +21,11 @@ MS = (ENT + CS) / 11
 import os
 import hashlib
 import secrets
+import unicodedata
 
+from typing import AnyStr
+
+PBKDF2_ROUNDS = 2048
 FAIR_DICE = ['1', '2', '3', '4', '5', '6']
 
 
@@ -32,9 +36,20 @@ class Mnemonic():
         self.wordlist = self.import_words_for_language()
         if number_of_words not in [12, 15, 18, 21, 24]:
             raise ValueError(
-                "El número permitido de palabras mnemónicas (BIP39) debe ser [12, 15, 18, 21, 24]"
+                'El número permitido de palabras mnemónicas (BIP39) debe ser [12, 15, 18, 21, 24]'
             )
         self.number_of_words = number_of_words
+
+    @staticmethod
+    def normalize_string(txt: AnyStr) -> str:
+        if isinstance(txt, bytes):
+            utxt = txt.decode('utf8')
+        elif isinstance(txt, str):
+            utxt = txt
+        else:
+            raise TypeError('String value expected')
+
+        return unicodedata.normalize('NFKD', utxt)
 
     @staticmethod
     def _get_directory() -> str:
@@ -77,7 +92,10 @@ class Mnemonic():
 
     @staticmethod
     def bits_to_bytearray(entropy: str) -> bytearray:
-        return bytearray.fromhex(hex(int(entropy, 2))[2:])
+        h = hex(int(entropy, 2))[2:]
+        if len(h) % 2 != 0:
+            h = '0' + h
+        return bytearray.fromhex(h)
 
     def generate_entropy(self, manually: bool = False) -> str:
         """Generar entropía lanzando n veces un dado."""
@@ -87,8 +105,12 @@ class Mnemonic():
             print(f'WARNING: Input is only {2.585 * len(r)} bits of entropy\n')
 
         br = r.encode()
-        entropy_length = self.get_entropy_length(self.number_of_words)
-        h = hashlib.shake_256(br).digest(entropy_length)
+        if self.number_of_words == 24:
+            h = hashlib.sha256(br).digest()
+        else:
+            entropy_length = self.get_entropy_length(self.number_of_words)
+            h = hashlib.shake_256(br).digest(entropy_length)
+
         entropy = bin(int.from_bytes(h, byteorder="big"))[2:].zfill(len(h) * 8)
         return entropy
 
@@ -109,6 +131,18 @@ class Mnemonic():
         result = ' '.join(result)
         return result
 
+    @classmethod
+    def to_seed(cls, mnemonic: str, passphrase: str = '') -> str:
+        mnemonic = cls.normalize_string(mnemonic)
+        passphrase = cls.normalize_string(passphrase)
+        passphrase = 'mnemonic' + passphrase
+        mnemonic_bytes = mnemonic.encode('utf-8')
+        passphrase_bytes = passphrase.encode('utf-8')
+        stretched = hashlib.pbkdf2_hmac(
+            "sha512", mnemonic_bytes, passphrase_bytes, PBKDF2_ROUNDS
+        )[:64].hex().zfill(128)
+        return stretched
+
     def generate_user_keys(self) -> dict[str, str]:
         entropy = self.generate_entropy(manually=False)
         checksum = self.generate_checksum(entropy)
@@ -116,11 +150,9 @@ class Mnemonic():
         full = entropy + checksum
         mnemonic = self.to_mnemonic(full)
 
+        seed = self.to_seed(mnemonic)
 
         print('entropy:', entropy)
         print('mnemonic:', mnemonic)
-        # mnemonic = self.to_mnemonic(entropy)
-
-
-
+        print('seed:', len(seed))
 

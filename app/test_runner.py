@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-print('Test Runner 🐈-₿')
+print('Test Runner 🐈-₿ Wallet')
 
 import unittest
 
@@ -14,6 +14,8 @@ def suite():
     suite.addTest(MnemonicTest('test_incorrect_number_of_words'))
     suite.addTest(MnemonicTest('test_checksum_from_binary_entropy'))
     suite.addTest(MnemonicTest('test_mnemonic_words_from_entropy'))
+    suite.addTest(MnemonicTest('test_the_seed_from_entroy'))
+    suite.addTest(MnemonicTest('test_the_seed_from_mnemonic_with_passphrase'))
     return suite
 
 if __name__ == '__main__':
