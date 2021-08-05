@@ -6,9 +6,9 @@ La implementación será llevada a cabo en Python, y estará acompañada de una 
 
 ## Contenido
 
-- [Generación de palabras mnemónicas](app/keys/mnemonic/mnemonic.md)
+- [Generación de palabras mnemónicas](/app/keys/mnemonic/mnemonic.md)
 
-![La Nuit](media/la_nuit.jpg?raw=true)
+![La Nuit](/media/la_nuit.jpg?raw=true)
 
 ```
 Porque la Nuit también quiere tener sus bitcoins guardados de manera segura.

@@ -30,7 +30,7 @@ Los tres pasos para generar una secuencia de palabras mnemónicas son:
 
 ## 2. De Entropía a palabras Mnemónicas
 
-![De entropía a palabras mnemónicas](media/entropy_to_mnemonic.jpg?raw=true)
+![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
 
 La entropía es un número binario aleatorio `eg. 10101001` de longitud `128, 160, 192, 224 o 256` bits. A partir de este número, se calcula un *checksum* que nos ayuda a detectar errores en la secuencia de palabras mnemónicas.
 
