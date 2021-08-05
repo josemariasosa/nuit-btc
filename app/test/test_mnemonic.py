@@ -124,3 +124,19 @@ class MnemonicTest(unittest.TestCase):
         self.assertEqual(seed21, 'da02641c6c6361bf9789e2578f03d930cf86970c3e76e031c7c1790d6459753e057c2b38b595547067dedb44ba5ec0d760180ab1c91771951b4e8b4ae16aa010', 'incorrect seed for entropy + passphrase')
         self.assertEqual(seed24, '90de6cddce732dce530079b85a0ee682f4af922402c661f8f3bba5dc1a5617e0b808169af32f639c6d3b9028702d80d4580fb37cbffc1923eb9f7dbe383e9da5', 'incorrect seed for entropy + passphrase')
         self.assertEqual(seed12a, '84b78500f9af9a3e8974b7f61fa4635906bd91f70e247340ebe7236d6be3b7fb4ab2b61b860dfa167e39d8449af4dff1cc9e4b9cb6bd6ed872f62304b0abf1e1', 'incorrect seed for entropy + passphrase')
+
+    def test_is_valid_mnemonic(self):
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic12))
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic15))
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic18))
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic21))
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic24))
+        self.assertTrue(self.m12.is_valid_mnemonic(self.mnemonic12a))
+
+    def test_is_not_valid_mnemonic(self):
+        self.assertFalse(self.m12.is_valid_mnemonic('impact age real prosper moon stable'))
+        self.assertFalse(self.m12.is_valid_mnemonic('not mnemonic words column crime rib woman budget job inch throw dog'))
+        self.assertFalse(self.m12.is_valid_mnemonic('attract spatial inform below borrow arrive fragile frog dirt apple medal harvest'))
+        self.assertFalse(self.m12.is_valid_mnemonic('depart catalog student bind sand pioneer library deer again muscle profit guitar battle laptop song venue attack combine fog afraid pulse'))
+        self.assertFalse(self.m12.is_valid_mnemonic(''))
+        self.assertFalse(self.m12.is_valid_mnemonic('post earn hope'))

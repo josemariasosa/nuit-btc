@@ -88,7 +88,7 @@ class Mnemonic():
     @staticmethod
     def get_entropy_length(number_of_words: int) -> int:
         """La fórmula proviene de despejar la longitud de entropía en BIP39."""
-        return int((352 * number_of_words) / (33 * 8)) # (1 byte = 8 bits)
+        return int((352 * number_of_words) / 33) # (1 byte = 8 bits)
 
     @staticmethod
     def bits_to_bytearray(entropy: str) -> bytearray:
@@ -109,7 +109,7 @@ class Mnemonic():
             h = hashlib.sha256(br).digest()
         else:
             entropy_length = self.get_entropy_length(self.number_of_words)
-            h = hashlib.shake_256(br).digest(entropy_length)
+            h = hashlib.shake_256(br).digest(entropy_length // 8)
 
         entropy = bin(int.from_bytes(h, byteorder="big"))[2:].zfill(len(h) * 8)
         return entropy
@@ -130,6 +130,29 @@ class Mnemonic():
             result.append(self.wordlist[idx])
         result = ' '.join(result)
         return result
+
+    def is_valid_mnemonic(self, mnemonic: str) -> bool:
+        bin_list = []
+        words = mnemonic.split(' ')
+        if len(words) not in [12, 15, 18, 21, 24]:
+            return False
+
+        for word in words:
+            if word in self.wordlist:
+                idx = self.wordlist.index(word)
+                bidx = bin(idx)[2:].zfill(11)
+                bin_list.append(bidx)
+            else:
+                return False
+
+        bbin = ''.join(bin_list)
+        entropy_length = self.get_entropy_length(len(words))
+        entropy = bbin[:entropy_length]
+        checksum = bbin[entropy_length:]
+
+        if self.generate_checksum(entropy) == checksum:
+            return True
+        return False
 
     @classmethod
     def to_seed(cls, mnemonic: str, passphrase: str = '') -> str:
