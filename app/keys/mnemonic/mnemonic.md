@@ -54,7 +54,7 @@ MS = (ENT + CS) / 11
 Un resumen de los valores permitidos se muestra en la siguiente tabla.
 
 |  ENT  | CS | ENT+CS |  MS  |
-+-------+----+--------+------+
+|-------|----|--------|------|
 |  128  |  4 |   132  |  12  |
 |  160  |  5 |   165  |  15  |
 |  192  |  6 |   198  |  18  |
