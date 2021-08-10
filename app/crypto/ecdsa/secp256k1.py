@@ -4,8 +4,8 @@
 import hashlib
 import hmac
 
-from keys.helper import encode_base58_checksum, hash160
-from keys.ecdsa.ecdsa import FieldElement, Point, Signature
+from crypto.helper import encode_base58_checksum, hash160
+from crypto.ecdsa.ecdsa import FieldElement, Point, Signature
 
 A = 0
 B = 7

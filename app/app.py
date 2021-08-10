@@ -29,8 +29,9 @@ def main():
     # print("parsed-xprv")
     # print(ek.xprv)
 
-    m = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
     ckd = ChildKeyDerivation(ek)
+    ckd.derive_from_path()
+    # print(ckd)
 
 
 if __name__ == '__main__':

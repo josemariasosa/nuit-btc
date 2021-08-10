@@ -5,11 +5,12 @@ import hashlib
 import hmac
 
 from crypto.ecdsa.secp256k1 import G
-from keys.helper import b58encode_extended_key, b58decode_extened_key
+from crypto.helper import b58encode_extended_key, b58decode_extened_key
 
 
 class NotValidMasterPrivateKey(Exception):
     """Not a valid Private Key for mainnet nor testnet."""
+
 
 class ImpossibleToGenerateExtendedKeys(Exception):
     """Not enough information to generate extended keys."""
@@ -24,9 +25,9 @@ class ExtendedKeys:
         else:
             self.master_private_key = kwargs.get('master_private_key')
             self.chain_code = kwargs.get('chain_code')
-            if bool(self.master_private_key) and bool(self.chain_code):
+            if not (bool(self.master_private_key) and bool(self.chain_code)):
                 raise ImpossibleToGenerateExtendedKeys(
-                    """A seed in hex or (chain code and master private key)
+                    """A seed in hex or (chain code and master private key) \
                     must be provided to generate extended keys."""
                 )
 
@@ -40,7 +41,7 @@ class ExtendedKeys:
     @staticmethod
     def compute_split_hash(seed: bytes) -> tuple[bytes, bytes]:
         # Compute HMAC-SHA512 of seed
-        seed = hmac.new(b"Bitcoin seed", seed, digestmod=hashlib.sha512).digest()
+        seed = hmac.new(key=b"Bitcoin seed", msg=seed, digestmod=hashlib.sha512).digest()
         return (
             seed[:32], # Master key
             seed[32:]  # Chain code
