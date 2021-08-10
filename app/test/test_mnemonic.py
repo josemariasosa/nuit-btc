@@ -6,7 +6,7 @@ import unittest
 from keys.mnemonic.mnemonic import Mnemonic
 
 class MnemonicTest(unittest.TestCase):
-    """Test para la generación de palabras mnemónicas y las llaves maestras."""
+    """Test para la generación de palabras mnemónicas y semilla."""
     def setUp(self):
         self.m12 = Mnemonic(language='english', number_of_words=12)
         self.m15 = Mnemonic(language='english', number_of_words=15)

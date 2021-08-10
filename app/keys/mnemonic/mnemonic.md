@@ -1,4 +1,4 @@
-# Generación de palabras mnemónicas
+# Generación de palabras mnemónicas (BIP-39)
 
 La secuencia de palabras mnemónicas, o **semilla mnemónica**, es la representación codificada de un número aleatorio enorme. A partir de esta secuencia de palabras se crea una **semilla**, que puede ser utilizada para recrear, de manera segura y estándar, todas las direcciones y llaves extendidas de una cartera jerárquica determinista.
 
@@ -65,8 +65,23 @@ Como buena práctica, por seguirdad se recomienda utilizar una entropía de 256 
 
 Por último, cada palabra mnemónica está directamente mapeada utilizando 11 bits. 
 
+![Palabras mnemónicas](/media/mnemonic_mapping.jpg?raw=true)
+
+La lista completa de palabras se encuentra en múltiples idiomas, incluyendo inglés, español, francés e italiano. La lista completa de palabras puede ser revisada en el [BIP-39 Wordlist](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md).
+
+
 ## 3. De palabras Mnemónicas a Semilla
 
+Para poder generar una semilla a partir de las `12, 15, 18, 21 o 24` palabras, primero se valida que el *checksum* sea correcto y posteriormente se pasa a través de una función PBKDF2, Password-Based Key Derivation Function 2. Utilizando los siguientes parámetros:
+
+- **2048** rondas de HMAC-SHA512.
+- Password: secuencia de palábras mnemónicas.
+- Salt: "mnemonic" + *passphrase* (la palabra "mnemonic" es un string fijo que se añade).
+- El Password y la Salt están codificados como UTF-8 NFKD.
+
+![Palabras mnemónicas a semilla](/media/mnemonic_seed.jpg?raw=true)
+
+El resultado es una semilla de 512 bits, o 128 caracteres en hexadecimal.
 
 
 
