@@ -5,8 +5,8 @@ import unittest
 
 from random import randint
 
-from keys.ecdsa.ecdsa import FieldElement, Point, Signature
-from keys.ecdsa.secp256k1 import G, N, S256Point, PrivateKey
+from crypto.ecdsa.ecdsa import FieldElement, Point, Signature
+from crypto.ecdsa.secp256k1 import G, N, S256Point, PrivateKey
 
 
 class FieldElementTest(unittest.TestCase):

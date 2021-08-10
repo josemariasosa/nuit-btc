@@ -4,23 +4,31 @@
 import hashlib
 import hmac
 
-from keys.ecdsa.secp256k1 import G
+from crypto.ecdsa.secp256k1 import G
 from keys.helper import b58encode_extended_key, b58decode_extened_key
 
 
 class NotValidMasterPrivateKey(Exception):
     """Not a valid Private Key for mainnet nor testnet."""
 
+class ImpossibleToGenerateExtendedKeys(Exception):
+    """Not enough information to generate extended keys."""
 
-class ExtendedKeys():
+
+class ExtendedKeys:
     """docstring for ExtendedKeys"""
-    def __init__(self, seed: hex = None, testnet: bool = False, **kwargs):
+    def __init__(self, seed: str = None, testnet: bool = False, **kwargs):
         if bool(seed):
             self.seed = bytes.fromhex(seed)
             self.master_private_key, self.chain_code = self.compute_split_hash(self.seed)
         else:
             self.master_private_key = kwargs.get('master_private_key')
             self.chain_code = kwargs.get('chain_code')
+            if bool(self.master_private_key) and bool(self.chain_code):
+                raise ImpossibleToGenerateExtendedKeys(
+                    """A seed in hex or (chain code and master private key)
+                    must be provided to generate extended keys."""
+                )
 
         self.testnet = testnet
         self.master_public_key = self.generate_public_key(self.master_private_key)
@@ -38,7 +46,7 @@ class ExtendedKeys():
             seed[32:]  # Chain code
         )
 
-    def extended_private_serialization(self):
+    def extended_private_serialization(self) -> str:
         # Serialization format can be found at: https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Serialization_format
         xprv = b"\x04\x88\xad\xe4"  # Version for private mainnet
         if self.testnet:
@@ -57,7 +65,7 @@ class ExtendedKeys():
         # Return base58
         return b58encode_extended_key(xprv)
 
-    def extended_public_serialization(self):
+    def extended_public_serialization(self) -> str:
         xpub = b"\x04\x88\xb2\x1e"  # Version for private mainnet
         if self.testnet:
             xpub = b"\x04\x35\x87\xcf"  # Version for private testnet
@@ -76,11 +84,11 @@ class ExtendedKeys():
         return b58encode_extended_key(xpub)
 
     @property
-    def xprv(self):
+    def xprv(self) -> str:
         return self.extended_private_serialization()
 
     @property
-    def xpub(self):
+    def xpub(self) -> str:
         return self.extended_public_serialization()
 
     @classmethod

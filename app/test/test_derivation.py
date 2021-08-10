@@ -57,6 +57,8 @@ class ExtendedKeysTest(unittest.TestCase):
     def test_invalid_xprv_for_parser(self):
         invalid_xprv1 = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHT'
         invalid_xprv2 = 'zprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U'
+        invalid_xprv3 = 'xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e'
 
         self.assertRaises(NotValidMasterPrivateKey, ExtendedKeys.parse_extended_private_key, xprv=invalid_xprv1)
         self.assertRaises(NotValidMasterPrivateKey, ExtendedKeys.parse_extended_private_key, xprv=invalid_xprv2)
+        self.assertRaises(NotValidMasterPrivateKey, ExtendedKeys.parse_extended_private_key, xprv=invalid_xprv3)
