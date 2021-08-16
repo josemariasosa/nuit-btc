@@ -8,7 +8,7 @@ import hmac
 from dataclasses import dataclass
 
 
-from crypto.ecdsa.secp256k1 import P, G, S256Point
+from crypto.ecdsa.secp256k1 import P, G, S256Point, PrivateKey
 # from crypto.helper import b58encode_extended_key, b58decode_extened_key
 
 from keys.derivation.extended import ExtendedKeys
@@ -49,14 +49,33 @@ REGEX_DERIVATION_PATH = re.compile("^m(/[0-9]+['hH]?)*$")
 # class InvalidDerivationPath(Exception):
 #     """Invalid format for derivation path."""
 
+def _generate_public_key(private_key: bytes) -> bytes:
+    point = int.from_bytes(private_key, 'big') * G
+    return point.sec(compressed=True)
 
 @dataclass
 class KeyChain:
     """Class to keep track of the parent and child keys."""
-    privkey: bytes
-    pubkey: bytes
     chaincode: bytes
+    privkey: bytes = None
+    pubkey: bytes = None
     fingerprint: bytes = None # parent's pubkey fingerprint
     depth: int = 0
     index: int = 0
     testnet: bool = False
+
+    @classmethod
+    def from_seed(cls, seed: str = '0c0d0e0f', testnet=False):
+        bytes_seed = bytes.fromhex(seed)
+        h = hmac.new(key=b"Bitcoin seed", msg=bytes_seed,
+                     digestmod=hashlib.sha512).digest()
+        privkey = h[:32]
+        pubkey = _generate_public_key(privkey)
+        chaincode = h[32:]
+        return KeyChain(chaincode=chaincode,
+                        privkey=privkey,
+                        pubkey=pubkey,
+                        testnet=testnet)
+
+    
+

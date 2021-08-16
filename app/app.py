@@ -4,6 +4,7 @@
 from keys.mnemonic.mnemonic import Mnemonic
 from keys.derivation.extended import ExtendedKeys
 from keys.derivation.derivation import ChildKeyDerivation
+from keys.derivation.keychain import KeyChain
 
 def main():
     m = Mnemonic("english", 12)
@@ -32,6 +33,10 @@ def main():
     # ckd = ChildKeyDerivation(ek)
     # ckd.derive_from_path()
     # # print(ckd)
+
+    master_keys = KeyChain.from_seed(seed)
+
+    print(master_keys)
 
 
 if __name__ == '__main__':
