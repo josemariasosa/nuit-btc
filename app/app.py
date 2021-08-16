@@ -35,8 +35,9 @@ def main():
     # # print(ckd)
 
     master_keys = KeyChain.from_seed(seed)
+    # master_keys = KeyChain.from_xkey('xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8')
 
-    print(master_keys)
+    print(master_keys.xpub)
 
 
 if __name__ == '__main__':
