@@ -39,37 +39,26 @@ ENCODING_PREFIX = {
 }
 
 
-# def _derive_hardened_private_child(privkey, chaincode, index):
-#     """A.k.a CKDpriv, in bip-0032, but the hardened way
-#     :param privkey: The parent's private key, as bytes
-#     :param chaincode: The parent's chaincode, as bytes
-#     :param index: The index of the node to derive, as int
-#     :return: (child_privatekey, child_chaincode)
-#     """
-#     # assert isinstance(privkey, bytes) and isinstance(chaincode, bytes)
-#     # assert index & HARDENED_INDEX
-#     # payload is the I from the BIP. Index is 32 bits unsigned int, BE.
+def _derive_hardened_private_child(privkey, chaincode, index) -> tuple[bytes, bytes]:
+    h = hmac.new(key=chaincode,
+                 msg=b"\x00" + privkey + index.to_bytes(4, "big"),
+                 digestmod=hashlib.sha512).digest()
+    L256 = h[:32]
+    R256 = h[32:]
 
-#     """
-#     I = HMAC-SHA512(Key = cpar, Data = 0x00 || ser256(kpar) || ser32(i)).
-#     (Note: The 0x00 pads the private key to make it 33 bytes long.)
-#     """
+    child_privkey = (int.from_bytes(L256, 'big')
+                     + int.from_bytes(privkey, 'big')) % P
 
+    return child_privkey.to_bytes(32, 'big'), R256
 
-#     I = hmac.new(
-#         chaincode, b"\x00" + privkey + index.to_bytes(4, "big"), hashlib.sha512
-#     ).digest()
-
-#     L256 = I[:32]
-#     R256 = I[32:]
-
-#     child_privkey = (int.from_bytes(L256, 'big') + int.from_bytes(privkey, 'big')) % P
-
-#     return child_privkey.to_bytes(32, 'big'), R256
+def _pubkey_to_fingerprint(pubkey):
+    rip = hashlib.new("ripemd160")
+    rip.update(hashlib.sha256(pubkey).digest())
+    return rip.digest()[:4]
 
 
-# class InvalidDerivationPath(Exception):
-#     """Invalid format for derivation path."""
+class InvalidDerivationPath(Exception):
+    """Invalid format for derivation path."""
 
 
 class NotValidMasterPrivateKey(Exception):
@@ -98,6 +87,22 @@ def _parse_version(version: bytes) -> tuple[str, str]:
             if ENCODING_PREFIX[network][key] == version:
                 return network, key
     raise NotValidMasterPrivateKey('Invalid version.')
+
+def _parse_str_path_as_index_list(path: str) -> list[int]:
+    if not REGEX_DERIVATION_PATH.match(path):
+        raise InvalidDerivationPath(f'{path}')
+
+    steps = path.split('/')
+    steps.pop(0)
+
+    index_list = []
+    for step in steps:
+        if step[-1] in ["'", "h", "H"]:
+            index_list.append(int(step[:-1]) + HARDENED_INDEX)
+        else:
+            index_list.append(int(step))
+
+    return index_list
 
 @dataclass
 class KeyChain:
@@ -201,5 +206,28 @@ class KeyChain:
     @property
     def xpub(self) -> str:
         return self.serialization(KeyType.PUBLIC)
+
+    def derive_child_from_path(self, path: str):
+        steps = _parse_str_path_as_index_list(path)
+        parent = self
+        for relative_depth, index in enumerate(steps):
+            if index >= HARDENED_INDEX:
+                assert self.privkey is not None
+                privkey, chaincode = _derive_hardened_private_child(
+                    parent.privkey, parent.chaincode, index
+                )
+                pubkey = _generate_public_key(privkey)
+            child = KeyChain(chaincode=chaincode,
+                             privkey=privkey,
+                             pubkey=pubkey,
+                             fingerprint=_pubkey_to_fingerprint(pubkey),
+                             depth=parent.depth+relative_depth+1,
+                             index=index,
+                             testnet=parent.testnet)
+            parent = child
+
+            print('parent.privkey', parent.privkey)
+            print('child.privkey', privkey)
+
 
 
