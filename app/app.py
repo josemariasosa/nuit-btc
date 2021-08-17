@@ -14,30 +14,15 @@ def main():
     # seed = m.to_seed(mnemonic)
 
     seed = '000102030405060708090a0b0c0d0e0f'
-    # ek = ExtendedKeys(seed)
-    # # # xpriv = ek.master_private_key
-    # # # xpub = ek.master_public_key
+    # seed = 'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542'
+    path = 'm/0H/1/0H/7'
 
-    # # print("xpub")
-    # # print(ek.xpub)
-    # # print("xprv")
-    # # print(ek.xprv)
-    # # exit()
+    master = KeyChain.from_seed(seed)
+    child = master.derive_child_from_path(path)
 
-    # # ek = ExtendedKeys.parse_extended_private_key('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi')
-    # # print("parsed-xpub")
-    # # print(ek.xpub)
-    # # print("parsed-xprv")
-    # # print(ek.xprv)
+    print('child.xprv', child.xprv)
+    print('child.xpub', child.xpub)
 
-    # ckd = ChildKeyDerivation(ek)
-    # ckd.derive_from_path()
-    # # print(ckd)
-
-    master_keys = KeyChain.from_seed(seed)
-    # master_keys = KeyChain.from_xkey('xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8')
-
-    print(master_keys.xpub)
 
 
 if __name__ == '__main__':

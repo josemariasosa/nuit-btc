@@ -68,9 +68,10 @@ private_key_tests = [
 ]
 
 extended_keys_tests = [
-    'test_extended_keys_from_seed',
+    'test_extended_master_keys_from_seed',
     'test_xpub_from_parsed_xprv',
-    'test_invalid_xprv_for_parser'
+    'test_invalid_xprv_for_parser',
+    'test_child_private_key_derivation'
 ]
 
 

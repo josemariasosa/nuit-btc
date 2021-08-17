@@ -39,17 +39,27 @@ ENCODING_PREFIX = {
 }
 
 
-def _derive_hardened_private_child(privkey, chaincode, index) -> tuple[bytes, bytes]:
-    h = hmac.new(key=chaincode,
-                 msg=b"\x00" + privkey + index.to_bytes(4, "big"),
-                 digestmod=hashlib.sha512).digest()
+def _generate_public_key(private_key: bytes) -> bytes:
+    point = int.from_bytes(private_key, 'big') * G
+    return point.sec(compressed=True)
+
+
+def _derive_private_child(privkey: bytes, chaincode: bytes,
+                          index: int, hard: bool=True) -> tuple[bytes, bytes]:
+    if hard:
+        msg = b"\x00" + privkey + index.to_bytes(4, "big")
+    else:
+        pubkey = _generate_public_key(privkey)
+        msg = pubkey + index.to_bytes(4, "big")
+
+    h = hmac.new(key=chaincode, msg=msg, digestmod=hashlib.sha512).digest()
     L256 = h[:32]
     R256 = h[32:]
 
     child_privkey = (int.from_bytes(L256, 'big')
-                     + int.from_bytes(privkey, 'big')) % P
-
+                    + int.from_bytes(privkey, 'big')) % P
     return child_privkey.to_bytes(32, 'big'), R256
+
 
 def _pubkey_to_fingerprint(pubkey):
     rip = hashlib.new("ripemd160")
@@ -68,10 +78,6 @@ class NotValidMasterPrivateKey(Exception):
 class ImpossibleToGenerateExtendedKeys(Exception):
     """Not enough information to generate extended keys."""
 
-
-def _generate_public_key(private_key: bytes) -> bytes:
-    point = int.from_bytes(private_key, 'big') * G
-    return point.sec(compressed=True)
 
 def _assert_checksum(xkey: bytes, checksum: bytes) -> None:
     # Double hash using SHA256
@@ -140,13 +146,13 @@ class KeyChain:
         xkey = xkey[4:]
         network, key_type = _parse_version(version)
 
-        depth = xkey[:1]
+        depth = int.from_bytes(xkey[:1], 'big')
         xkey = xkey[1:]
 
         fingerprint = xkey[:4] if xkey[:4] != b'\x00' * 4 else None
         xkey = xkey[4:]
 
-        index = xkey[:4]
+        index = int.from_bytes(xkey[:4], 'big')
         xkey = xkey[4:]
 
         chaincode = xkey[:32]
@@ -175,7 +181,7 @@ class KeyChain:
         network = Network.TESTNET if self.testnet else Network.MAINNET
         version = ENCODING_PREFIX[network][key_type]
         depth = self.depth.to_bytes(1, 'big')
-        fingerprint = b'\x00' * 4 if self.fingerprint is None else fingerprint
+        fingerprint = b'\x00' * 4 if self.fingerprint is None else self.fingerprint
         index = self.index.to_bytes(4, 'big')
 
         if key_type == KeyType.PRIVATE:
@@ -210,24 +216,24 @@ class KeyChain:
     def derive_child_from_path(self, path: str):
         steps = _parse_str_path_as_index_list(path)
         parent = self
-        for relative_depth, index in enumerate(steps):
+        for index in steps:
             if index >= HARDENED_INDEX:
                 assert self.privkey is not None
-                privkey, chaincode = _derive_hardened_private_child(
-                    parent.privkey, parent.chaincode, index
+                privkey, chaincode = _derive_private_child(
+                    parent.privkey, parent.chaincode, index, hard=True
+                )
+                pubkey = _generate_public_key(privkey)
+            else:
+                privkey, chaincode = _derive_private_child(
+                    parent.privkey, parent.chaincode, index, hard=False
                 )
                 pubkey = _generate_public_key(privkey)
             child = KeyChain(chaincode=chaincode,
                              privkey=privkey,
                              pubkey=pubkey,
-                             fingerprint=_pubkey_to_fingerprint(pubkey),
-                             depth=parent.depth+relative_depth+1,
+                             fingerprint=_pubkey_to_fingerprint(parent.pubkey),
+                             depth=parent.depth+1,
                              index=index,
                              testnet=parent.testnet)
             parent = child
-
-            print('parent.privkey', parent.privkey)
-            print('child.privkey', privkey)
-
-
-
+        return child
