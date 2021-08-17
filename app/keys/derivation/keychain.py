@@ -215,25 +215,26 @@ class KeyChain:
 
     def derive_child_from_path(self, path: str):
         steps = _parse_str_path_as_index_list(path)
-        parent = self
-        for index in steps:
+        for _, index in enumerate(steps):
+            _privkey = self.privkey if _ == 0 else privkey
+            _chaincode = self.chaincode if _ == 0 else chaincode
             if index >= HARDENED_INDEX:
                 assert self.privkey is not None
                 privkey, chaincode = _derive_private_child(
-                    parent.privkey, parent.chaincode, index, hard=True
+                    _privkey, _chaincode, index, hard=True
                 )
-                pubkey = _generate_public_key(privkey)
             else:
                 privkey, chaincode = _derive_private_child(
-                    parent.privkey, parent.chaincode, index, hard=False
+                    _privkey, _chaincode, index, hard=False
                 )
-                pubkey = _generate_public_key(privkey)
-            child = KeyChain(chaincode=chaincode,
-                             privkey=privkey,
-                             pubkey=pubkey,
-                             fingerprint=_pubkey_to_fingerprint(parent.pubkey),
-                             depth=parent.depth+1,
-                             index=index,
-                             testnet=parent.testnet)
-            parent = child
+
+        pubkey = _generate_public_key(privkey)
+        parent_pubkey = _generate_public_key(_privkey)
+        child = KeyChain(chaincode=chaincode,
+                         privkey=privkey,
+                         pubkey=pubkey,
+                         fingerprint=_pubkey_to_fingerprint(parent_pubkey),
+                         depth=self.depth+len(steps),
+                         index=steps[-1],
+                         testnet=self.testnet)
         return child
