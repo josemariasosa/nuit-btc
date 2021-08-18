@@ -3,7 +3,7 @@
 
 import unittest
 
-from keys.derivation.keychain import KeyChain, NotValidMasterPrivateKey
+from key.keychain import KeyChain, NotValidMasterPrivateKey
 
 class ExtendedKeysTest(unittest.TestCase):
     """Test para la generación la llave maestra."""

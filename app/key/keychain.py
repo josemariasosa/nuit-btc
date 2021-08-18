@@ -1,71 +1,21 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import re
 import hashlib
 import hmac
 
 from enum import Enum, auto
-
 from dataclasses import dataclass
 
-
-from crypto.ecdsa.secp256k1 import P, G, S256Point, PrivateKey
-from crypto.helper import b58encode_extended_key, b58decode_extened_key
-
-from keys.derivation.extended import ExtendedKeys
-
-HARDENED_INDEX = (2 ** 32) // 2
-REGEX_DERIVATION_PATH = re.compile("^m(/[0-9]+['hH]?)*$")
-
-class Network(Enum):
-    MAINNET = auto()
-    TESTNET = auto()
-
-class KeyType(Enum):
-    PRIVATE = auto()
-    PUBLIC = auto()
-
-
-ENCODING_PREFIX = {
-    Network.MAINNET: {
-        KeyType.PRIVATE: b'\x04\x88\xAD\xE4',
-        KeyType.PUBLIC: b'\x04\x88\xB2\x1E',
-    },
-    Network.TESTNET: {
-        KeyType.PRIVATE: b'\x04\x35\x83\x94',
-        KeyType.PUBLIC: b'\x04\x35\x87\xCF',
-    },
-}
-
-
-def _generate_public_key(private_key: bytes) -> bytes:
-    point = int.from_bytes(private_key, 'big') * G
-    return point.sec(compressed=True)
-
-
-def _derive_private_child(privkey: bytes, chaincode: bytes,
-                          index: int, hard: bool=True) -> tuple[bytes, bytes]:
-    if hard:
-        msg = b"\x00" + privkey + index.to_bytes(4, "big")
-    else:
-        pubkey = _generate_public_key(privkey)
-        msg = pubkey + index.to_bytes(4, "big")
-
-    h = hmac.new(key=chaincode, msg=msg, digestmod=hashlib.sha512).digest()
-    L256 = h[:32]
-    R256 = h[32:]
-
-    child_privkey = (int.from_bytes(L256, 'big')
-                    + int.from_bytes(privkey, 'big')) % P
-    return child_privkey.to_bytes(32, 'big'), R256
-
-
-def _pubkey_to_fingerprint(pubkey):
-    rip = hashlib.new("ripemd160")
-    rip.update(hashlib.sha256(pubkey).digest())
-    return rip.digest()[:4]
-
+from key.utils import (
+    HARDENED_INDEX,
+    REGEX_DERIVATION_PATH,
+    _b58encode_extended_key,
+    _b58decode_extened_key,
+    _generate_public_key,
+    _derive_private_child,
+    _pubkey_to_fingerprint
+)
 
 class InvalidDerivationPath(Exception):
     """Invalid format for derivation path."""
@@ -79,6 +29,27 @@ class ImpossibleToGenerateExtendedKeys(Exception):
     """Not enough information to generate extended keys."""
 
 
+class Network(Enum):
+    MAINNET = auto()
+    TESTNET = auto()
+
+class KeyType(Enum):
+    PRIVATE = auto()
+    PUBLIC = auto()
+
+
+ENCODING_PREFIX = {
+    Network.MAINNET: {
+        KeyType.PRIVATE: b'\x04\x88\xAD\xE4',
+        KeyType.PUBLIC: b'\x04\x88\xB2\x1E'
+    },
+    Network.TESTNET: {
+        KeyType.PRIVATE: b'\x04\x35\x83\x94',
+        KeyType.PUBLIC: b'\x04\x35\x87\xCF'
+    },
+}
+
+
 def _assert_checksum(xkey: bytes, checksum: bytes) -> None:
     # Double hash using SHA256
     hashed_xkey = hashlib.sha256(xkey).digest()
@@ -87,12 +58,14 @@ def _assert_checksum(xkey: bytes, checksum: bytes) -> None:
     if checksum != hashed_xkey[:4]:
         raise NotValidMasterPrivateKey('Invalid checksum.')
 
+
 def _parse_version(version: bytes) -> tuple[str, str]:
     for network in list(Network):
         for key in list(KeyType):
             if ENCODING_PREFIX[network][key] == version:
                 return network, key
     raise NotValidMasterPrivateKey('Invalid version.')
+
 
 def _parse_str_path_as_index_list(path: str) -> list[int]:
     if not REGEX_DERIVATION_PATH.match(path):
@@ -109,6 +82,7 @@ def _parse_str_path_as_index_list(path: str) -> list[int]:
             index_list.append(int(step))
 
     return index_list
+
 
 @dataclass
 class KeyChain:
@@ -136,7 +110,7 @@ class KeyChain:
 
     @classmethod
     def from_xkey(cls, xkey: str):
-        xkey = b58decode_extened_key(xkey)
+        xkey = _b58decode_extened_key(xkey)
 
         checksum = xkey[-4:]
         xkey = xkey[:-4]
@@ -203,7 +177,7 @@ class KeyChain:
         xkey += hashed_xkey[:4]
 
         # Return base58
-        return b58encode_extended_key(xkey)
+        return _b58encode_extended_key(xkey)
 
     @property
     def xprv(self) -> str:

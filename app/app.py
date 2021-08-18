@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-from keys.mnemonic.mnemonic import Mnemonic
-from keys.derivation.extended import ExtendedKeys
-from keys.derivation.derivation import ChildKeyDerivation
-from keys.derivation.keychain import KeyChain
+from key.mnemonic import Mnemonic
+from key.keychain import KeyChain
 
 def main():
     m = Mnemonic("english", 12)
@@ -25,19 +23,19 @@ def main():
     print('****')
     print(child.xpub)
     print('xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ')
-    print('\n\n\n')
+    # print('\n\n\n')
 
-    seed = '3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678'
-    path = 'm/0H/1H'
+    # seed = '3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678'
+    # path = 'm/0H/1H'
 
-    master = KeyChain.from_seed(seed)
-    child = master.derive_child_from_path(path)
+    # master = KeyChain.from_seed(seed)
+    # child = master.derive_child_from_path(path)
 
-    print(child.xprv)
-    print('xprv9xJocDuwtYCMNAo3Zw76WENQeAS6WGXQ55RCy7tDJ8oALr4FWkuVoHJeHVAcAqiZLE7Je3vZJHxspZdFHfnBEjHqU5hG1Jaj32dVoS6XLT1')
-    print('****')
-    print(child.xpub)
-    print('xpub6BJA1jSqiukeaesWfxe6sNK9CCGaujFFSJLomWHprUL9DePQ4JDkM5d88n49sMGJxrhpjazuXYWdMf17C9T5XnxkopaeS7jGk1GyyVziaMt')
+    # print(child.xprv)
+    # print('xprv9xJocDuwtYCMNAo3Zw76WENQeAS6WGXQ55RCy7tDJ8oALr4FWkuVoHJeHVAcAqiZLE7Je3vZJHxspZdFHfnBEjHqU5hG1Jaj32dVoS6XLT1')
+    # print('****')
+    # print(child.xpub)
+    # print('xpub6BJA1jSqiukeaesWfxe6sNK9CCGaujFFSJLomWHprUL9DePQ4JDkM5d88n49sMGJxrhpjazuXYWdMf17C9T5XnxkopaeS7jGk1GyyVziaMt')
 
 
 if __name__ == '__main__':

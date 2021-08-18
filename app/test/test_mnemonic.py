@@ -3,7 +3,7 @@
 
 import unittest
 
-from keys.mnemonic.mnemonic import Mnemonic
+from key.mnemonic import Mnemonic
 
 class MnemonicTest(unittest.TestCase):
     """Test para la generación de palabras mnemónicas y semilla."""
