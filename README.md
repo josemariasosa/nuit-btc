@@ -1,4 +1,5 @@
 # Nuit-BTC Wallet
+🐈-₿ Wallet
 
 Implementación de una **Cartera Jerárquica Determinista** para Bitcoin (BTC).
 
