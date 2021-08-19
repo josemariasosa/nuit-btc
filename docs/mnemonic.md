@@ -146,6 +146,8 @@ El *checksum*, en Python 🐍, se calcula convirtiendo la entropía en un `bytea
 El hash resultante se convierte a número binario y se seleccionan los `CS` primeros valores.
 
 ```python
+import hashlib
+
 def bits_to_bytearray(entropy: str) -> bytearray:
     h = hex(int(entropy, 2))[2:]
     if len(h) % 2 != 0:
@@ -193,47 +195,116 @@ def to_mnemonic(full: str) -> str:
     return result
 ```
 
+Para nuestro ejemplo, estas son las palabras mnemónicas en inglés. Es indispensable mantener el orden de las palabras.
+
+```text
+1. husband              13. brand
+2. core                 14. column
+3. field                15. scan
+4. gym                  16. shuffle
+5. another              17. honey
+6. morning              18. fuel
+7. spatial              19. bullet
+8. tribe                20. follow
+9. coil                 21. stone
+10. diesel              22. prosper
+11. coffee              23. pluck
+12. exercise            24. travel
+```
+
 
 ### HODL como un profesional 🔐
 
 Es responsabilidad de cada usuario almacenar de manera segura y secreta la secuencia de palabras mnemónicas. A partir de estas palabras, es posible recrear todas las llaves públicas y privadas de una **Cartera Jerárquica Determinista**. Esto convierte a las palabras mnemónicas en el respaldo de todos los fondos que están guardados en una cartera.
 
-Con el fin de preservar seguras y accesibles las palabras mnemónicas durante muchos años, es común el grabado de las mismas en una [placa de metal](https://blog.coinkite.com/seedplate-backup/). Si se piensa llevar a cabo esto, es importante recordar que las palabras del BIP-39 están específicamente seleccionadas para ser reconocidads utilizando **solo los primeros 4 caracteres**. Reduciendo de esta manera la cantidad total de caracteres que se requieren grabar.
+Con el fin de preservar seguras y accesibles las palabras mnemónicas durante muchos años, es común el grabado de las mismas en una [placa de metal](https://blog.coinkite.com/seedplate-backup/). Si se piensa llevar a cabo esto, es importante recordar que las palabras del BIP-39 están específicamente seleccionadas para ser reconocidads utilizando **solo los primeros 4 caracteres**. Reduciendo la cantidad total de caracteres que se requieren grabar.
+
+```text
+    saxofón      ->       saxo
+    sección      ->       secc
+    seco         ->       seco
+    secreto      ->       secr
+    secta        ->       sect
+    sed          ->       sed
+    seguir       ->       segu
+```
 
 
 ## 3. De palabras Mnemónicas a Semilla
 
+El siguiente paso es convertir las palabras mnemónicas a una semilla hexadecimal de 512 bits.
+
+<p align="center">
+    <img src="/media/mnemonic_seed.jpg?raw=true" height="600" width="600">
+</p>
 
 
-Una manera segura de almacenar las palabras mnemónicas es mediante el grabado de las mismas en placas de metal. 
+Los pasos se muestran a continuación.
 
 
+### I. Validar el checksum ⚡️
+
+Independientemente de la manera en que están almacenadas las palabras mnemónicas, para poder construír una semilla hay que acomodar las palabras en orden, completas, en minúsculas y en un solo `string`. Exactamente como lucen en la lista de palabras del BIP-39.
+
+```python
+mnemonic = 'husband core field gym another morning spatial tribe coil diesel coffee exercise brand column scan shuffle honey fuel bullet follow stone prosper pluck travel'
+```
+
+Primero, se debe validar que el *checksum* esté correcto. Este paso evita que se generen secuencias de palabras mnenómicas sin pasar por los pasos anteriores de generación de entropía.
 
 
+### II. Preparar parámetros 🎑
 
-Una vez teniendo nuestas palabras mnemónicas, es recomendable almacenarlas
+Tres son los parámetros que permiten generar una semilla:
+
+1. La secuencia mnemónica con *checksum* válido.
+2. El `string` literal: `mnemonic`.
+3. Un *passphrase* opcional. El *passphrase* es un `string` libre, que el usuario puede definir con la intención de incrementar la seguridad de sus fondos. Por ejemplo, si las palabras mnemónicas han sido comprometidas, un adversario no podrá robar los fondos sin contar con el *passphrase* correcto, el cual puede estar almacenado en una locación distinta.
 
 
+### III. Derivación de semilla 🌱
 
-Para poder generar una semilla a partir de las `12, 15, 18, 21 o 24` palabras, primero se valida que el *checksum* sea correcto y posteriormente se pasa a través de una función PBKDF2, Password-Based Key Derivation Function 2. Utilizando los siguientes parámetros:
+La derivación de la semilla se lleva a cabo a través de la función [PBKDF2](https://docs.python.org/3/library/hashlib.html#key-derivation), *Password-Based Key Derivation Function 2*, utilizando los siguiente parámetros:
 
-- **2048** rondas de HMAC-SHA512.
+- **2048** rondas del algoritmo HMAC-SHA512.
 - Password: secuencia de palábras mnemónicas.
 - Salt: "mnemonic" + *passphrase* (la palabra "mnemonic" es un string fijo que se añade).
 - El Password y la Salt están codificados como UTF-8 NFKD.
 
+```py
+import hashlib
+import unicodedata
+
+def normalize_string(txt: AnyStr) -> str:
+    if isinstance(txt, bytes):
+        utxt = txt.decode('utf8')
+    elif isinstance(txt, str):
+        utxt = txt
+    else:
+        raise TypeError('String value expected')
+
+    return unicodedata.normalize('NFKD', utxt)
+
+def to_seed(mnemonic: str, passphrase: str = '') -> str:
+    mnemonic = normalize_string(mnemonic)
+    passphrase = normalize_string(passphrase)
+    passphrase = 'mnemonic' + passphrase
+    mnemonic_bytes = mnemonic.encode('utf-8')
+    passphrase_bytes = passphrase.encode('utf-8')
+    stretched = hashlib.pbkdf2_hmac(
+        "sha512", mnemonic_bytes, passphrase_bytes, PBKDF2_ROUNDS
+    ).hex().zfill(128)
+    return stretched
+```
 
 
-![Palabras mnemónicas a semilla](/media/mnemonic_seed.jpg?raw=true)
+El resultado es una semilla de 512 bits, 64 bytes o 128 caracteres en hexadecimal. Para nuestro ejemplo el resultado es:
 
-El resultado es una semilla de 512 bits, o 128 caracteres en hexadecimal.
+```python
+seed = '88b855401b6410f73e4307191adf48d067b28b82ba72e65fd7101d2cbfce7a22d812a9d13dc4b95687558ae8a7abf1afa7d3266dcf4f4d27246d97c8ecb65a17'
+```
 
+Sigue leyendo cómo a partir de esta semilla, es posible generar todas las llaves públicas y privadas de nuestra Cartera Jerárquica Deterministica:
 
+- [Generación de llaves extendidas (BIP-32)](/docs/extended_key.md)
 
-<!-- 
-**¿Qué tan grande podría llegar a ser una llave privada?**
-
-El número aleatorio podría ir tan alto como `2^256`, o lo que es aproximadamente lo mismo un 1 seguido de 77 ceros: `10^77`. Podríamos pensarlo de la siguiente manera: existen tantas posibles llaves privadas en Bitcoin como el número de átomos en un billón de galaxias. -->
-
-
-## 

@@ -8,7 +8,7 @@ La implementación será llevada a cabo en Python, y estará acompañada de una 
 ## Contenido
 
 - [Generación de palabras mnemónicas (BIP-39)](/docs/mnemonic.md)
-- [Generación de llaves extendidas (BIP-32)](/docs/extended.md)
+- [Generación de llaves extendidas (BIP-32)](/docs/extended_key.md)
 
 ![La Nuit](/media/la_nuit.jpg?raw=true)
 

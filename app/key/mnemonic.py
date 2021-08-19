@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-"""
-https://learnmeabitcoin.com/technical/mnemonic#generate-entropy
-
-https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
-
-CS = ENT / 32
-MS = (ENT + CS) / 11
-
-|  ENT  | CS | ENT+CS |  MS  |
-+-------+----+--------+------+
-|  128  |  4 |   132  |  12  |
-|  160  |  5 |   165  |  15  |
-|  192  |  6 |   198  |  18  |
-|  224  |  7 |   231  |  21  |
-|  256  |  8 |   264  |  24  |
-"""
-
 import os
 import hashlib
 import secrets
@@ -163,7 +146,7 @@ class Mnemonic():
         passphrase_bytes = passphrase.encode('utf-8')
         stretched = hashlib.pbkdf2_hmac(
             "sha512", mnemonic_bytes, passphrase_bytes, PBKDF2_ROUNDS
-        )[:64].hex().zfill(128)
+        ).hex().zfill(128)
         return stretched
 
     def generate_user_keys(self) -> dict[str, str]:
@@ -177,5 +160,6 @@ class Mnemonic():
 
         print('entropy:', entropy)
         print('mnemonic:', mnemonic)
+        print('seed:', seed)
         print('seed:', len(seed))
 

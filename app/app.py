@@ -5,8 +5,9 @@ from key.mnemonic import Mnemonic
 from key.keychain import KeyChain
 
 def main():
-    # m = Mnemonic("english", 12)
-    # print(m.generate_user_keys())
+    m = Mnemonic("english", 12)
+    print(m.generate_user_keys())
+    exit()
 
     # mnemonic = 'weekend breeze child puppy detail assault input wish bubble junior mention destroy'
     # seed = m.to_seed(mnemonic)
