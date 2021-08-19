@@ -37,10 +37,10 @@ Para una computadora/máquina, es prácticamente imposible generar entropía pur
 
 Lanzar un dado físico, y justo, en **al menos 99 ocasiones**, permitirá capturar la suficiente entropía para construír una llave privada segura.
 
-Los siguientes pasos se llevan a cabo para obtener la entropía:
+Los siguientes pasos se llevan a cabo para generar entropía:
 
 
-### I. Tirar el dado
+### I. Tirar un dado 🎲
 
 Lanzar un dado al menos 99 veces y capturar los lanzamientos en un `string`.
 
@@ -51,12 +51,16 @@ r = '516461345612346512346515432122346153415623465123641562346512346512346512346
 Para el ejemplo se tiró el dado 101 veces.
 
 
-### II. Número de palabras mnemónicas
+### II. Seleccionar un número de palabras mnemónicas 📝
 
-Definir el número de palabras mnemónicas entre: `12, 15, 18, 21, 24`. Es recomendable utilizar 24 palabras, sin embargo utilizar 12 es estadísticamente seguro también.
+Definir un número de palabras mnemónicas dentro del siguiente `set`: `{12, 15, 18, 21, 24}`.
+
+Este número se defini a partir de la conveniencia y el caso particular de cada persona. Es más sencillo memorizar un menor número de palabras.
+
+Es recomendable utilizar 24 palabras, sin embargo utilizar 12 es estadísticamente seguro también.
 
 
-### III. Calcular Hash
+### III. Calcular Hash #️⃣
 
 Revisando la [**Tabla I de conversión de entropía**](), podemos observar la cantidad de bits `ENT`necesarios, en función del número de palabras mnemónicas, para convertir nuestro `string` de lanzamientos `r` en bits de entropía.
 
