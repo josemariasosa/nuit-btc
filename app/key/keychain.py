@@ -207,7 +207,7 @@ class KeyChain:
     def xpub(self) -> str:
         return self.serialization(KeyType.PUBLIC)
 
-    def _get_child_using_privkey(self, steps):
+    def _get_child_using_privkey(self, steps: list):
         for _, index in enumerate(steps):
             _privkey = self.privkey if _ == 0 else privkey
             _chaincode = self.chaincode if _ == 0 else chaincode
@@ -232,7 +232,7 @@ class KeyChain:
                          testnet=self.testnet)
         return child
 
-    def _get_child_using_pubkey(self, steps):
+    def _get_child_using_pubkey(self, steps: list):
         for _, index in enumerate(steps):
             _pubkey = self.pubkey if _ == 0 else pubkey
             _chaincode = self.chaincode if _ == 0 else chaincode
