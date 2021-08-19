@@ -167,10 +167,29 @@ La entropía secreta se concatena con el checksum para permitir formar una caden
 
 Posteriormente, dicha cadena se separa en *chunks* de 11 bits.
 
+```python
+entropy = '0110111111100110000010010101011110110100000000001001100100011111111101000010011101000010001011010100011110110000101101001010011110100001101100000101101110110000000011100011101101101101001010111011110001111000101011010101110101100101010110010010100110101111'
+checksum = generate_checksum(entropy)
+
+full = entropy + checksum
+```
+
 
 ### III. Mapear chunks con palabras Mnemónicas 🗺
 
 Cada uno de los chunks de `11 bits` puede ser individualmente mapeado con la lista de palabras estándar definida en el BIP-39. La lista completa de palabras se encuentra en múltiples idiomas, incluyendo inglés, español, francés e italiano. La lista completa de palabras puede ser revisada en el [BIP-39 Wordlist](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md).
+
+```python
+wordlist = import_words_for_language()              # From BIP-39
+
+def to_mnemonic(full: str) -> str:
+    result = []
+    for i in range(len(full) // 11):
+        idx = int(full[i * 11 : (i + 1) * 11], 2)
+        result.append(wordlist[idx])
+    result = ' '.join(result)
+    return result
+```
 
 
 ## 3. De palabras Mnemónicas a Semilla
