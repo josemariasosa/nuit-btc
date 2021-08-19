@@ -134,6 +134,9 @@ Un resumen de los cálculos de estos valores se muestra en la **Tabla I**.
 
 Los siguientes pasos se llevan a cabo para generar las palabras mnemónicas a partir de la entropía:
 
+<a href="url"><img src="/media/entropy_to_mnemonic.jpg?raw=true" align="left" height="200" width="200" ></a>
+
+
 ![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
 
 
@@ -200,6 +203,10 @@ Para poder generar una semilla a partir de las `12, 15, 18, 21 o 24` palabras, p
 - Password: secuencia de palábras mnemónicas.
 - Salt: "mnemonic" + *passphrase* (la palabra "mnemonic" es un string fijo que se añade).
 - El Password y la Salt están codificados como UTF-8 NFKD.
+
+
+
+<a href="url"><img src="http://url.to/image.png" align="left" height="200" width="200" ></a>
 
 ![Palabras mnemónicas a semilla](/media/mnemonic_seed.jpg?raw=true)
 
