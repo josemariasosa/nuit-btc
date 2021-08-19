@@ -13,7 +13,7 @@ from test.test_ecdsa import (
     S256Test,
     PrivateKeyTest
 )
-from test.test_derivation import ExtendedKeysTest
+from test.test_derivation import KeyChainTest
 
 mnemonic_tests = [
     'test_binary_entropy_size_from_number_of_words',
@@ -67,11 +67,12 @@ private_key_tests = [
     'test_wif'
 ]
 
-extended_keys_tests = [
+key_chain_tests = [
     'test_extended_master_keys_from_seed',
     'test_xpub_from_parsed_xprv',
     'test_invalid_xprv_for_parser',
-    'test_child_private_key_derivation'
+    'test_child_private_key_derivation',
+    'test_public_key_derivation'
 ]
 
 
@@ -99,8 +100,8 @@ def suite():
     for test in private_key_tests:
         suite.addTest(PrivateKeyTest(test))
 
-    for test in extended_keys_tests:
-        suite.addTest(ExtendedKeysTest(test))
+    for test in key_chain_tests:
+        suite.addTest(KeyChainTest(test))
 
     return suite
 

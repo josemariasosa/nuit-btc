@@ -5,8 +5,7 @@ import unittest
 
 from key.keychain import KeyChain, NotValidMasterPrivateKey
 
-class ExtendedKeysTest(unittest.TestCase):
-    """Test para la generación la llave maestra."""
+class KeyChainTest(unittest.TestCase):
     def setUp(self):
         # Test vectors from https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vectors
 
@@ -161,3 +160,23 @@ class ExtendedKeysTest(unittest.TestCase):
         self.assertEqual(child41.xprv, self.xprv41, f'incorrect child derivation: {self.path41}, {self.seed4[:5]}')
         self.assertEqual(child42.xpub, self.xpub42, f'incorrect child derivation: {self.path42}, {self.seed4[:5]}')
         self.assertEqual(child42.xprv, self.xprv42, f'incorrect child derivation: {self.path42}, {self.seed4[:5]}')
+
+    def test_public_key_derivation(self):
+        paths = [
+            {'base': 'm/0H/1/2H', 'comp': '/2/1000000000'},
+            {'base': 'm/0H/1', 'comp': '/4/14'},
+            {'base': 'm/10034', 'comp': '/101'}
+        ]
+        for path in paths:
+            for seed in [self.seed1, self.seed2, self.seed3, self.seed4]:
+                path_base = path.get('base')
+                path_comp = path.get('comp')
+
+                master = KeyChain.from_seed(seed)
+                child = master.derive_child_from_path(path_base)
+                childres_1 = master.derive_child_from_path(path_base + path_comp)
+
+                master2 = KeyChain.from_xkey(child.xpub)
+                childres_2 = master2.derive_child_from_path('m' + path_comp)
+
+                self.assertEqual(childres_1.xpub, childres_2.xpub, f'incorrect public key derivation.')
