@@ -51,7 +51,7 @@ r = '516461345612346512346515432122346153415623465123641562346512346512346512346
 Para el ejemplo se tiró el dado 101 veces.
 
 
-### II. Seleccionar un número de palabras mnemónicas 📝
+### II. Seleccionar un número de palabras Mnemónicas 📝
 
 Definir un número de palabras mnemónicas dentro del siguiente `set`: `{12, 15, 18, 21, 24}`.
 
@@ -81,7 +81,7 @@ h = hashlib.shake_256(br).digest(128 // 8)  # Obtener el digest del hash en byte
 ```
 
 
-### IV. Convertir Hash a Número Binario 0️⃣1️⃣
+### IV. Convertir Hash a número binario 0️⃣1️⃣
 
 ```py
 i = int.from_bytes(h, 'big')                # Convertir bytes a entero big-endian
@@ -96,11 +96,10 @@ print(entropy)
 # 0110111111100110000010010101011110110100000000001001100100011111111101000010011101000010001011010100011110110000101101001010011110100001101100000101101110110000000011100011101101101101001010111011110001111000101011010101110101100101010110010010100110101111
 ```
 
+
 ## 2. De Entropía a palabras Mnemónicas
 
-![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
-
-La entropía es un número binario aleatorio `eg. 10101001` de longitud `128, 160, 192, 224 o 256` bits. A partir de este número, se calcula un *checksum* que nos ayuda a detectar errores en la secuencia de palabras mnemónicas.
+La entropía está dada por un número binario aleatorio `eg. 10101001` de longitud: `128, 160, 192, 224 o 256` bits. A partir de este número, se calcula el *checksum*, que nos ayuda a detectar y prevenir errores en la secuencia de palabras.
 
 El tamaño del *checksum* está en función de la longitud de la entropía.
 
@@ -119,7 +118,7 @@ MS = número_de_palabras_mnemónicas
 MS = (ENT + CS) / 11
 ```
 
-Un resumen de los valores permitidos se muestra en la siguiente tabla.
+Un resumen de los cálculos de estos valores se muestra en la **Tabla I**.
 
 
 ##### Tabla I. Conversión de entropía (en bits)
@@ -133,13 +132,45 @@ Un resumen de los valores permitidos se muestra en la siguiente tabla.
 |  256  |  8 |   264  |  24  |
 
 
-Como buena práctica, por seguirdad se recomienda utilizar una entropía de 256 bits, lo que resultaría en una secuencia de palábras mnemónicas de 24.
+Los siguientes pasos se llevan a cabo para generar las palabras mnemónicas a partir de la entropía:
 
-Por último, cada palabra mnemónica está directamente mapeada utilizando 11 bits. 
+![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
 
-![Palabras mnemónicas](/media/mnemonic_mapping.jpg?raw=true)
 
-La lista completa de palabras se encuentra en múltiples idiomas, incluyendo inglés, español, francés e italiano. La lista completa de palabras puede ser revisada en el [BIP-39 Wordlist](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md).
+### I. Calcular el checksum ✅
+
+El *checksum*, en Python 🐍, se calcula convirtiendo la entropía en un `bytearray`, luego calculando el hash utilzando el algoritmo SHA256.
+
+El hash resultante se convierte a número binario y se seleccionan los `CS` primeros valores.
+
+```python
+def bits_to_bytearray(entropy: str) -> bytearray:
+    h = hex(int(entropy, 2))[2:]
+    if len(h) % 2 != 0:
+        h = '0' + h
+    return bytearray.fromhex(h)
+
+def generate_checksum(entropy: str) -> str:
+    """Entropy is in Binary but must be converted into bytearray."""
+    b = bits_to_bytearray(entropy)
+    h = hashlib.sha256(b).digest()
+    checksum_length = len(entropy) // 32
+    checksum_bits = bin(int.from_bytes(h, 'big'))[2:].zfill(256)
+    checksum = checksum_bits[:checksum_length]
+    return str(checksum)
+```
+
+
+### II. Concatenar la entropía + checksum 🖇
+
+La entropía secreta se concatena con el checksum para permitir formar una cadena binaria con `11 bits` por cada palabra mnemónica.
+
+Posteriormente, dicha cadena se separa en *chunks* de 11 bits.
+
+
+### III. Mapear chunks con palabras Mnemónicas 🗺
+
+Cada uno de los chunks de `11 bits` puede ser individualmente mapeado con la lista de palabras estándar definida en el BIP-39. La lista completa de palabras se encuentra en múltiples idiomas, incluyendo inglés, español, francés e italiano. La lista completa de palabras puede ser revisada en el [BIP-39 Wordlist](https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md).
 
 
 ## 3. De palabras Mnemónicas a Semilla
