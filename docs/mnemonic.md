@@ -194,7 +194,26 @@ def to_mnemonic(full: str) -> str:
 ```
 
 
+### HODL como un profesional 🔐
+
+Es responsabilidad de cada usuario almacenar de manera segura y secreta la secuencia de palabras mnemónicas. A partir de estas palabras, es posible recrear todas las llaves públicas y privadas de una **Cartera Jerárquica Determinista**. Esto convierte a las palabras mnemónicas en el respaldo de todos los fondos que están guardados en una cartera.
+
+Con el fin de preservar seguras y accesibles las palabras mnemónicas durante muchos años, es común el grabado de las mismas en una [placa de metal](https://blog.coinkite.com/seedplate-backup/). Si se piensa llevar a cabo esto, es importante recordar que las palabras del BIP-39 están específicamente seleccionadas para ser reconocidads utilizando **solo los primeros 4 caracteres**. Reduciendo de esta manera la cantidad total de caracteres que se requieren grabar.
+
+
 ## 3. De palabras Mnemónicas a Semilla
+
+
+
+Una manera segura de almacenar las palabras mnemónicas es mediante el grabado de las mismas en placas de metal. 
+
+
+
+
+
+Una vez teniendo nuestas palabras mnemónicas, es recomendable almacenarlas
+
+
 
 Para poder generar una semilla a partir de las `12, 15, 18, 21 o 24` palabras, primero se valida que el *checksum* sea correcto y posteriormente se pasa a través de una función PBKDF2, Password-Based Key Derivation Function 2. Utilizando los siguientes parámetros:
 
@@ -204,8 +223,6 @@ Para poder generar una semilla a partir de las `12, 15, 18, 21 o 24` palabras, p
 - El Password y la Salt están codificados como UTF-8 NFKD.
 
 
-
-<a href="url"><img src="http://url.to/image.png" align="left" height="200" width="200" ></a>
 
 ![Palabras mnemónicas a semilla](/media/mnemonic_seed.jpg?raw=true)
 
