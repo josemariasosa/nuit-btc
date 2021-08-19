@@ -135,11 +135,8 @@ Un resumen de los cálculos de estos valores se muestra en la **Tabla I**.
 Los siguientes pasos se llevan a cabo para generar las palabras mnemónicas a partir de la entropía:
 
 <p align="center">
-    <img src="/media/entropy_to_mnemonic.jpg?raw=true" height="700" width="700">
+    <img src="/media/entropy_to_mnemonic.jpg?raw=true" height="600" width="600">
 </p>
-
-
-![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
 
 
 ### I. Calcular el checksum ✅
