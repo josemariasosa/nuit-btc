@@ -55,22 +55,20 @@ Para el ejemplo se tiró el dado 101 veces.
 
 Definir un número de palabras mnemónicas dentro del siguiente `set`: `{12, 15, 18, 21, 24}`.
 
-Este número se defini a partir de la conveniencia y el caso particular de cada persona. Es más sencillo memorizar un menor número de palabras.
-
-Es recomendable utilizar 24 palabras, sin embargo utilizar 12 es estadísticamente seguro también.
+Este número se selecciona a partir de la conveniencia y el caso de uso particular de cada persona. Es más sencillo memorizar un menor número de palabras, sin embargo se recomiendan utilizar 24 palabras, para una mayor seguridad.
 
 
 ### III. Calcular Hash #️⃣
 
-Revisando la [**Tabla I de conversión de entropía**](), podemos observar la cantidad de bits `ENT`necesarios, en función del número de palabras mnemónicas, para convertir nuestro `string` de lanzamientos `r` en bits de entropía.
+Revisando la [**Tabla I de conversión de entropía**](https://github.com/josemariasosa/nuit-btc/blob/master/docs/mnemonic.md#tabla-i-conversi%C3%B3n-de-entrop%C3%ADa-en-bits), podemos observar la cantidad de bits `ENT`necesarios, en función del número de palabras mnemónicas, para convertir nuestro `string` de lanzamientos `r` en bits de entropía.
 
 Para 24 palabras mnemónicas, se necesitan 256 bits de entropía, por lo tanto, utilizamos el algoritmo [SHA256](https://docs.python.org/3/library/hashlib.html#hash-algorithms).
 
 ```py
 import hashlib
 
-br = r.encode()                     # Convertir str a bytes
-h = hashlib.sha256(br).digest()     # Obtener el digest del hash en bytes
+br = r.encode()                             # Convertir str a bytes
+h = hashlib.sha256(br).digest()             # Obtener el digest del hash en bytes
 ```
 
 Para un menor número de palabras mnemónicas utilizamos el algoritmo [SHAKE](https://docs.python.org/3/library/hashlib.html#shake-variable-length-digests) que permite generar un hash de longitud variable.
@@ -83,12 +81,12 @@ h = hashlib.shake_256(br).digest(128 // 8)  # Obtener el digest del hash en byte
 ```
 
 
-### IV. Convertir Hash a Número Binario
+### IV. Convertir Hash a Número Binario 0️⃣1️⃣
 
 ```py
-i = int.from_bytes(h, 'big')        # Convertir bytes a entero big-endian
-b = bin(i)[2:]                      # Convertir entero a bits | Retirar prefijo `0b`
-entropy = b.zfill(len(h) * 8)       # Incluir zeros a la izquierda
+i = int.from_bytes(h, 'big')                # Convertir bytes a entero big-endian
+b = bin(i)[2:]                              # Convertir entero a bits | Retirar prefijo `0b`
+entropy = b.zfill(len(h) * 8)               # Incluir zeros a la izquierda
 ```
 
 
