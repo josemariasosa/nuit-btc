@@ -1,14 +1,14 @@
 # Generación de palabras mnemónicas (BIP-39)
 
-La secuencia de palabras mnemónicas, o **semilla mnemónica**, es la representación codificada de un número aleatorio enorme. A partir de esta secuencia de palabras se crea una **semilla**, que puede ser utilizada para recrear, de manera segura y estándar, todas las direcciones y llaves extendidas de una cartera jerárquica determinista.
+La secuencia de palabras mnemónicas, o **semilla mnemónica**, es la representación codificada de un número aleatorio grandísimo. A partir de esta secuencia de palabras se crea una **semilla**, que puede ser utilizada para recrear, de manera segura y estándar, todas las direcciones y llaves extendidas de una cartera jerárquica determinista.
 
-Por lo general, una **semilla** se representa utilizando un número hexadecial. Un ejemplo se muestra a continuación, comienza con `0x` para indicar que está codificado en hexadecimal.
+Por lo general, una **semilla** se representa utilizando un número hexadecial. Un ejemplo se muestra a continuación, comienza con `0x` para indicar que está codificado en hexadecimal. La semilla es de **64 bytes**.
 
 ```py
 0x1e64005ec6246b473c7af8f59b39f1a98b493ac02a2757c7902a4f2265e4d6cb2697d1858d35cda6a404e3c1d4d46733aa8129d2c4c9b2d917faba88a77df488
 ```
 
-Imaginemos tener que escribir en una hoja de papel dicho número para respaldar nuestra cartera. Estaríamos propensos fácilmente errores. Es por esto que los desarrolladores de Bitcoin definieron un estándar, conocido como [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki), para codificar de una manera amigable la semilla.
+Imaginemos tener que escribir en una hoja de papel dicho número para respaldar nuestra cartera. Estaríamos propensos fácilmente errores. Es por eso que se definió un estándar, conocido como [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki), para codificar de una manera fácil de leer y almacenar, la semilla.
 
 La representación codificada con BIP-39 de la **semilla** anterior es:
 
@@ -16,16 +16,28 @@ La representación codificada con BIP-39 de la **semilla** anterior es:
 sample tooth steak column crime rib woman budget job inch throw dog
 ```
 
-Mucho más sencillo de manejar y almacenar.
+Mucho más sencillo de manejar y almacenar 😺.
 
 Los tres pasos para generar una secuencia de palabras mnemónicas son:
 
-1. [Generar Entropía]()
-2. [De Entropía a palabras Mnemónicas]()
-3. [De palabras Mnemónicas a Semilla]()
+1. [Generar Entropía](https://github.com/josemariasosa/nuit-btc/blob/master/docs/mnemonic.md#1-generar-entrop%C3%ADa)
+2. [De Entropía a palabras Mnemónicas](https://github.com/josemariasosa/nuit-btc/blob/master/docs/mnemonic.md#2-de-entrop%C3%ADa-a-palabras-mnem%C3%B3nicas)
+3. [De palabras Mnemónicas a Semilla](https://github.com/josemariasosa/nuit-btc/blob/master/docs/mnemonic.md#3-de-palabras-mnem%C3%B3nicas-a-semilla)
 
 
 ## 1. Generar Entropía
+
+La [**entropía**](https://es.wikipedia.org/wiki/Entrop%C3%ADa) es un concepto complejo y hasta contradictorio, dependiendo de su interpretación. Si tomamos la definición propuesta por el físico austríaco [Ludwig Boltzmann](https://es.wikipedia.org/wiki/Ludwig_Boltzmann) entre 1890 y 1900, la entropía es un parámetro, una medida, para el desorden. Es la probabilidad de un estado particular.
+
+Una manera de imaginarlo es dejando caer un vaso de cristal al suelo. Tenderá a romperse y a esparcirse, mientras que jamás será posible que, lanzando trozos de cristal, se construya un vaso por sí solo.
+
+Llevando este concepto al contexto de Bitcoin, es necesario generar entropía para que, de la misma manera que con las piezas del vaso, sea imposible que alguien más pueda regenerar aleatoriamente nuestra llave privada.
+
+Para una computadora/máquina, es prácticamente imposible generar entropía pura, pues está ligada a procesos deterministicos que permiten únicamente la generación de [números pseudoaleatorios](https://es.wikipedia.org/wiki/N%C3%BAmero_pseudoaleatorio). Es por eso que para generar un número completamente aleatorio, que jamás haya sido creado, ni visto, anteriormente, la cartera Nuit-BTC le permite al usuario generar entropía mediante el lanzamiento de un dado `n` veces.
+
+Lanzar un dado físico, y justo, en **al menos 99 ocasiones**, permitirá capturar suficiente entropía para construír una llave privada segura.
+
+
 
 
 ## 2. De Entropía a palabras Mnemónicas
