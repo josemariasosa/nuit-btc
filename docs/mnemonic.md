@@ -89,6 +89,12 @@ b = bin(i)[2:]                              # Convertir entero a bits | Retirar 
 entropy = b.zfill(len(h) * 8)               # Incluir zeros a la izquierda
 ```
 
+Al final, la entropía para nuestro ejemplo `r`, utilizando 24 palabras resultaría en:
+
+```py
+print(entropy)
+# 0110111111100110000010010101011110110100000000001001100100011111111101000010011101000010001011010100011110110000101101001010011110100001101100000101101110110000000011100011101101101101001010111011110001111000101011010101110101100101010110010010100110101111
+```
 
 ## 2. De Entropía a palabras Mnemónicas
 
@@ -118,7 +124,6 @@ Un resumen de los valores permitidos se muestra en la siguiente tabla.
 
 ##### Tabla I. Conversión de entropía (en bits)
 
-```
 |  ENT  | CS | ENT+CS |  MS  |
 |-------|----|--------|------|
 |  128  |  4 |   132  |  12  |
@@ -126,7 +131,7 @@ Un resumen de los valores permitidos se muestra en la siguiente tabla.
 |  192  |  6 |   198  |  18  |
 |  224  |  7 |   231  |  21  |
 |  256  |  8 |   264  |  24  |
-```
+
 
 Como buena práctica, por seguirdad se recomienda utilizar una entropía de 256 bits, lo que resultaría en una secuencia de palábras mnemónicas de 24.
 
