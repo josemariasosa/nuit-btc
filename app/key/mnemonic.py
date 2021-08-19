@@ -111,7 +111,7 @@ class Mnemonic():
             entropy_length = self.get_entropy_length(self.number_of_words)
             h = hashlib.shake_256(br).digest(entropy_length // 8)
 
-        entropy = bin(int.from_bytes(h, byteorder="big"))[2:].zfill(len(h) * 8)
+        entropy = bin(int.from_bytes(h, 'big'))[2:].zfill(len(h) * 8)
         return entropy
 
     def generate_checksum(self, entropy: str) -> str:
@@ -119,7 +119,7 @@ class Mnemonic():
         b = self.bits_to_bytearray(entropy)
         h = hashlib.sha256(b).digest()
         checksum_length = len(entropy) // 32
-        checksum_bits = bin(int.from_bytes(h, byteorder="big"))[2:].zfill(256)
+        checksum_bits = bin(int.from_bytes(h, 'big'))[2:].zfill(256)
         checksum = checksum_bits[:checksum_length]
         return str(checksum)
 

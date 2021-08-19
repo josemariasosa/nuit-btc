@@ -33,11 +33,59 @@ Una manera de imaginarlo es dejando caer un vaso de cristal al suelo. Tenderá a
 
 Llevando este concepto al contexto de Bitcoin, es necesario generar entropía para que, de la misma manera que con las piezas del vaso, sea imposible que alguien más pueda regenerar aleatoriamente nuestra llave privada.
 
-Para una computadora/máquina, es prácticamente imposible generar entropía pura, pues está ligada a procesos deterministicos que permiten únicamente la generación de [números pseudoaleatorios](https://es.wikipedia.org/wiki/N%C3%BAmero_pseudoaleatorio). Es por eso que para generar un número completamente aleatorio, que jamás haya sido creado, ni visto, anteriormente, la cartera Nuit-BTC le permite al usuario generar entropía mediante el lanzamiento de un dado `n` veces.
+Para una computadora/máquina, es prácticamente imposible generar entropía pura, pues está ligada a procesos deterministicos que permiten únicamente la generación de [números pseudoaleatorios](https://es.wikipedia.org/wiki/N%C3%BAmero_pseudoaleatorio). Es por eso que para generar un número completamente aleatorio, que jamás haya sido creado, ni visto, anteriormente, la cartera [Nuit-BTC](https://github.com/josemariasosa/nuit-btc) le permite al usuario generar entropía mediante el lanzamiento de un dado `n` veces.
 
-Lanzar un dado físico, y justo, en **al menos 99 ocasiones**, permitirá capturar suficiente entropía para construír una llave privada segura.
+Lanzar un dado físico, y justo, en **al menos 99 ocasiones**, permitirá capturar la suficiente entropía para construír una llave privada segura.
+
+Los siguientes pasos se llevan a cabo para obtener la entropía:
 
 
+### I. Tirar el dado
+
+Lanzar un dado al menos 99 veces y capturar los lanzamientos en un `string`.
+
+```py
+r = '51646134561234651234651543212234615341562346512364156234651234651234651234615234561235461513645123645'
+```
+
+Para el ejemplo se tiró el dado 101 veces.
+
+
+### II. Número de palabras mnemónicas
+
+Definir el número de palabras mnemónicas entre: `12, 15, 18, 21, 24`. Es recomendable utilizar 24 palabras, sin embargo utilizar 12 es estadísticamente seguro también.
+
+
+### III. Calcular Hash
+
+Revisando la [**Tabla I de conversión de entropía**](), podemos observar la cantidad de bits `ENT`necesarios, en función del número de palabras mnemónicas, para convertir nuestro `string` de lanzamientos `r` en bits de entropía.
+
+Para 24 palabras mnemónicas, se necesitan 256 bits de entropía, por lo tanto, utilizamos el algoritmo [SHA256](https://docs.python.org/3/library/hashlib.html#hash-algorithms).
+
+```py
+import hashlib
+
+br = r.encode()                     # Convertir str a bytes
+h = hashlib.sha256(br).digest()     # Obtener el digest del hash en bytes
+```
+
+Para un menor número de palabras mnemónicas utilizamos el algoritmo [SHAKE](https://docs.python.org/3/library/hashlib.html#shake-variable-length-digests) que permite generar un hash de longitud variable.
+
+```py
+import hashlib
+
+br = r.encode()                             # Convertir str a bytes
+h = hashlib.shake_256(br).digest(128 // 8)  # Obtener el digest del hash en bytes
+```
+
+
+### IV. Convertir Hash a Número Binario
+
+```py
+i = int.from_bytes(h, 'big')        # Convertir bytes a entero big-endian
+b = bin(i)[2:]                      # Convertir entero a bits | Retirar prefijo `0b`
+entropy = b.zfill(len(h) * 8)       # Incluir zeros a la izquierda
+```
 
 
 ## 2. De Entropía a palabras Mnemónicas
@@ -65,6 +113,10 @@ MS = (ENT + CS) / 11
 
 Un resumen de los valores permitidos se muestra en la siguiente tabla.
 
+
+##### Tabla I. Conversión de entropía (en bits)
+
+```
 |  ENT  | CS | ENT+CS |  MS  |
 |-------|----|--------|------|
 |  128  |  4 |   132  |  12  |
@@ -72,6 +124,7 @@ Un resumen de los valores permitidos se muestra en la siguiente tabla.
 |  192  |  6 |   198  |  18  |
 |  224  |  7 |   231  |  21  |
 |  256  |  8 |   264  |  24  |
+```
 
 Como buena práctica, por seguirdad se recomienda utilizar una entropía de 256 bits, lo que resultaría en una secuencia de palábras mnemónicas de 24.
 
