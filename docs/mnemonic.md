@@ -134,7 +134,9 @@ Un resumen de los cálculos de estos valores se muestra en la **Tabla I**.
 
 Los siguientes pasos se llevan a cabo para generar las palabras mnemónicas a partir de la entropía:
 
-<a href="url"><img src="/media/entropy_to_mnemonic.jpg?raw=true" align="center" height="800" width="800" ></a>
+<p align="center">
+    <img src="/media/entropy_to_mnemonic.jpg?raw=true" height="800" width="800">
+</p>
 
 
 ![De entropía a palabras mnemónicas](/media/entropy_to_mnemonic.jpg?raw=true)
