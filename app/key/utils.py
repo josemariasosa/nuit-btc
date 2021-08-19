@@ -5,8 +5,9 @@ import re
 import hashlib
 import hmac
 
-from crypto.ecdsa.secp256k1 import P, N, G
+from crypto.ecdsa.secp256k1 import N, G, S256Point
 
+ZERO = b'\x00'
 HARDENED_INDEX = (2 ** 32) // 2
 REGEX_DERIVATION_PATH = re.compile("^m(/[0-9]+['hH]?)*$")
 BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -32,6 +33,19 @@ def _derive_private_child(privkey: bytes, chaincode: bytes,
     child_privkey = (int.from_bytes(L256, 'big')
                     + int.from_bytes(privkey, 'big')) % N
     return child_privkey.to_bytes(32, 'big'), R256
+
+
+def _derive_public_child(pubkey: bytes, chaincode: bytes,
+                         index: int) -> tuple[bytes, bytes]:
+
+    msg = pubkey + index.to_bytes(4, "big")
+    h = hmac.new(key=chaincode, msg=msg, digestmod=hashlib.sha512).digest()
+    L256 = h[:32]
+    R256 = h[32:]
+
+    child_pubkey = S256Point.parse(pubkey) + (int.from_bytes(L256, 'big') * G)
+    child_pubkey = child_pubkey.sec(compressed=True)
+    return child_pubkey, R256
 
 
 def _pubkey_to_fingerprint(pubkey):

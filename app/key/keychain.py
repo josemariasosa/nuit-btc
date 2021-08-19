@@ -14,6 +14,7 @@ from key.utils import (
     _b58decode_extened_key,
     _generate_public_key,
     _derive_private_child,
+    _derive_public_child,
     _pubkey_to_fingerprint
 )
 
@@ -27,6 +28,10 @@ class NotValidMasterPrivateKey(Exception):
 
 class ImpossibleToGenerateExtendedKeys(Exception):
     """Not enough information to generate extended keys."""
+
+
+class ImpossibleToDeriveKeys(Exception):
+    """Not enough information to derive keys."""
 
 
 class Network(Enum):
@@ -49,12 +54,13 @@ ENCODING_PREFIX = {
     },
 }
 
+ZERO = b'\x00'
+
 
 def _assert_checksum(xkey: bytes, checksum: bytes) -> None:
     # Double hash using SHA256
     hashed_xkey = hashlib.sha256(xkey).digest()
     hashed_xkey = hashlib.sha256(hashed_xkey).digest()
-
     if checksum != hashed_xkey[:4]:
         raise NotValidMasterPrivateKey('Invalid checksum.')
 
@@ -73,14 +79,12 @@ def _parse_str_path_as_index_list(path: str) -> list[int]:
 
     steps = path.split('/')
     steps.pop(0)
-
     index_list = []
     for step in steps:
         if step[-1] in ["'", "h", "H"]:
             index_list.append(int(step[:-1]) + HARDENED_INDEX)
         else:
             index_list.append(int(step))
-
     return index_list
 
 
@@ -94,6 +98,17 @@ class KeyChain:
     depth: int = 0
     index: int = 0
     testnet: bool = False
+
+    def __str__(self):
+        chaincode = self.chaincode[:4]
+        privkey = self.privkey[:4] if self.privkey else None
+        pubkey = self.pubkey[:4] if self.pubkey else None
+        return ' '.join([
+            f'KeyChain(chaincode={chaincode}, privkey={privkey},',
+            f'pubkey={pubkey}, fingerprint={self.fingerprint},',
+            f'depth={self.depth}, index={self.index},',
+            f'testnet={self.testnet})'
+        ])
 
     @classmethod
     def from_seed(cls, seed: str = '0c0d0e0f', testnet=False):
@@ -123,7 +138,7 @@ class KeyChain:
         depth = int.from_bytes(xkey[:1], 'big')
         xkey = xkey[1:]
 
-        fingerprint = xkey[:4] if xkey[:4] != b'\x00' * 4 else None
+        fingerprint = xkey[:4] if xkey[:4] != ZERO * 4 else None
         xkey = xkey[4:]
 
         index = int.from_bytes(xkey[:4], 'big')
@@ -133,7 +148,7 @@ class KeyChain:
         xkey = xkey[32:]
 
         if key_type == KeyType.PRIVATE:
-            if xkey[:1] != b'\x00':
+            if xkey[:1] != ZERO:
                 raise NotValidMasterPrivateKey('Invalid private key.')
             privkey = xkey[1:]
             pubkey = _generate_public_key(privkey)
@@ -155,17 +170,22 @@ class KeyChain:
         network = Network.TESTNET if self.testnet else Network.MAINNET
         version = ENCODING_PREFIX[network][key_type]
         depth = self.depth.to_bytes(1, 'big')
-        fingerprint = b'\x00' * 4 if self.fingerprint is None else self.fingerprint
+        fingerprint = self.fingerprint if self.fingerprint else ZERO * 4
         index = self.index.to_bytes(4, 'big')
 
         if key_type == KeyType.PRIVATE:
             if self.privkey is None:
-                raise ImpossibleToGenerateExtendedKeys()
-            key = b'\x00' + self.privkey
+                raise ImpossibleToGenerateExtendedKeys('Privkey is required.')
+            key = ZERO + self.privkey
 
         else:
             assert key_type == KeyType.PUBLIC
-            key = self.pubkey
+            if self.pubkey:
+                key = self.pubkey
+            elif self.privkey:
+                key = _generate_public_key(privkey)
+            else:
+                raise ImpossibleToGenerateExtendedKeys('Privkey is required.')
 
         xkey = version + depth + fingerprint + index + self.chaincode + key
 
@@ -187,8 +207,7 @@ class KeyChain:
     def xpub(self) -> str:
         return self.serialization(KeyType.PUBLIC)
 
-    def derive_child_from_path(self, path: str):
-        steps = _parse_str_path_as_index_list(path)
+    def _get_child_using_privkey(self, steps):
         for _, index in enumerate(steps):
             _privkey = self.privkey if _ == 0 else privkey
             _chaincode = self.chaincode if _ == 0 else chaincode
@@ -211,4 +230,38 @@ class KeyChain:
                          depth=self.depth+len(steps),
                          index=steps[-1],
                          testnet=self.testnet)
+        return child
+
+    def _get_child_using_pubkey(self, steps):
+        for _, index in enumerate(steps):
+            _pubkey = self.pubkey if _ == 0 else pubkey
+            _chaincode = self.chaincode if _ == 0 else chaincode
+            if index >= HARDENED_INDEX:
+                raise ImpossibleToDeriveKeys('Privkey is required.')
+            else:
+                pubkey, chaincode = _derive_public_child(
+                    _pubkey, _chaincode, index
+                )
+
+        child = KeyChain(chaincode=chaincode,
+                         privkey=None,
+                         pubkey=pubkey,
+                         fingerprint=_pubkey_to_fingerprint(_pubkey),
+                         depth=self.depth+len(steps),
+                         index=steps[-1],
+                         testnet=self.testnet)
+        return child
+
+    def derive_child_from_path(self, path: str):
+        steps = _parse_str_path_as_index_list(path)
+        if len(steps) > 0:
+            if self.privkey:
+                child = self._get_child_using_privkey(steps)
+            elif self.pubkey:
+                child = self._get_child_using_pubkey(steps)
+            else:
+                raise ImpossibleToDeriveKeys('Pubkey is required.')
+        else:
+            child = self
+
         return child

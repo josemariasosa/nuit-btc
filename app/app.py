@@ -24,6 +24,7 @@ def main():
     master2 = KeyChain.from_xkey(child.xpub)
     child_result_2 = master2.derive_child_from_path(path3)
 
+    print(child)
     print(child_result_1.xpub)
     print(child_result_2.xpub)
 
