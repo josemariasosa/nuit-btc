@@ -232,14 +232,11 @@ Con el fin de preservar seguras y accesibles las palabras mnemónicas durante mu
 
 ## 3. De palabras Mnemónicas a Semilla
 
-El siguiente paso es convertir las palabras mnemónicas a una semilla hexadecimal de 512 bits.
+El último paso es convertir las palabras mnemónicas a una semilla hexadecimal de 512 bits.
 
 <p align="center">
     <img src="/media/mnemonic_seed.jpg?raw=true" height="600" width="600">
 </p>
-
-
-Los pasos se muestran a continuación.
 
 
 ### I. Validar el checksum ⚡️
@@ -274,6 +271,8 @@ La derivación de la semilla se lleva a cabo a través de la función [PBKDF2](h
 ```py
 import hashlib
 import unicodedata
+
+PBKDF2_ROUNDS = 2048
 
 def normalize_string(txt: AnyStr) -> str:
     if isinstance(txt, bytes):
