@@ -4,21 +4,38 @@
 from key.mnemonic import Mnemonic
 from key.keychain import KeyChain
 
+from crypto.ecdsa.secp256k1 import PrivateKey
+
 def main():
-    m = Mnemonic("english", 12)
-    print(m.generate_user_keys())
-    exit()
+    # m = Mnemonic("english", 12)
+    # print(m.generate_user_keys())
+    # exit()
 
     # mnemonic = 'weekend breeze child puppy detail assault input wish bubble junior mention destroy'
     # seed = m.to_seed(mnemonic)
 
-    seed = '000102030405060708090a0b0c0d0e0f'
+    # seed = '000102030405060708090a0b0c0d0e0f'
     # # seed = 'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542'
-    path1 = 'm/0H/1'
-    path2 = 'm/0H/1/4/14'
-    path3 = 'm/4/14'
+    mnemonic = 'asthma unfold shoot water noodle govern employ gun sea able morning hip rifle ocean fork'
+    path = "m/44'/0'/0'/0/0"
 
+    seed = Mnemonic.to_seed(mnemonic)
     master = KeyChain.from_seed(seed)
+
+    child = master.derive_child_from_path(path)
+
+    print(child.address)
+    print(child.pubkey.hex())
+    print(child.privkey.hex())
+    wif = child.privkey_wif
+    print('*******')
+    print(PrivateKey.parse(wif).hex())
+
+
+    exit()
+
+
+
     child = master.derive_child_from_path(path1)
     child_result_1 = master.derive_child_from_path(path2)
 

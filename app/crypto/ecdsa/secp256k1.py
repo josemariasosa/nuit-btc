@@ -4,6 +4,7 @@
 import hashlib
 import hmac
 
+from crypto.base58 import _decode_base58
 from crypto.helper import encode_base58_checksum, hash160
 from crypto.ecdsa.ecdsa import FieldElement, Point, Signature
 
@@ -15,6 +16,10 @@ N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
 # Generator Point (G)
 g1 = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
 g2 = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
+
+
+class IncorrectPrivateKeyWifFormat(Exception):
+    """Unable to parse WIF private key."""
 
 
 class S256Field(FieldElement):
@@ -172,3 +177,30 @@ class PrivateKey:
             suffix = b''
         # encode_base58_checksum the whole thing
         return encode_base58_checksum(prefix + secret_bytes + suffix)
+
+    @classmethod
+    def parse(self, wif: str):
+        decoded = _decode_base58(wif, 38)
+        checksum = decoded[-4:]
+        secret = decoded[:-4]
+
+        double_hash = hashlib.sha256(hashlib.sha256(secret).digest()).digest()
+        if checksum != double_hash[:4]:
+            raise IncorrectPrivateKeyWifFormat('Incorrect WIF checksum.')
+
+        compressed = secret[-1:] == b'\x01'
+        if compressed:
+            secret = secret[:-1]
+        else:
+            secret = secret[1:]
+
+        prefix = secret[:1]
+        secret = secret[1:]
+        if prefix == b'\xef':
+            testnet = True
+        elif prefix == b'\x80':
+            testnet = False
+        else:
+            raise IncorrectPrivateKeyWifFormat()
+
+        return PrivateKey(int.from_bytes(secret, 'big'))
