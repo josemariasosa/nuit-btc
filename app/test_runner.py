@@ -14,6 +14,7 @@ from test.test_ecdsa import (
     PrivateKeyTest
 )
 from test.test_derivation import KeyChainTest
+from test.test_address import AddressTest
 
 mnemonic_tests = [
     'test_binary_entropy_size_from_number_of_words',
@@ -75,6 +76,10 @@ key_chain_tests = [
     'test_public_key_derivation'
 ]
 
+address_tests = [
+    'test_address_pubkey_privkey'
+]
+
 
 def suite():
     suite = unittest.TestSuite()
@@ -102,6 +107,9 @@ def suite():
 
     for test in key_chain_tests:
         suite.addTest(KeyChainTest(test))
+
+    for test in address_tests:
+        suite.addTest(AddressTest(test))
 
     return suite
 
