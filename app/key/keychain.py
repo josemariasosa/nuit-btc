@@ -7,15 +7,18 @@ import hmac
 from enum import Enum, auto
 from dataclasses import dataclass
 
+from crypto.base58 import _encode_base58, _decode_base58
+
 from key.utils import (
+    ZERO,
     HARDENED_INDEX,
     REGEX_DERIVATION_PATH,
-    _b58encode_extended_key,
-    _b58decode_extened_key,
     _generate_public_key,
     _derive_private_child,
     _derive_public_child,
-    _pubkey_to_fingerprint
+    _pubkey_to_fingerprint,
+    _pubkey_to_address,
+    _privkey_to_wif
 )
 
 class InvalidDerivationPath(Exception):
@@ -54,8 +57,6 @@ ENCODING_PREFIX = {
     },
 }
 
-ZERO = b'\x00'
-
 
 def _assert_checksum(xkey: bytes, checksum: bytes) -> None:
     # Double hash using SHA256
@@ -88,7 +89,7 @@ def _parse_str_path_as_index_list(path: str) -> list[int]:
     return index_list
 
 
-@dataclass
+@dataclass(frozen=True)
 class KeyChain:
     """Class to keep track of the parent and child keys."""
     chaincode: bytes
@@ -125,7 +126,7 @@ class KeyChain:
 
     @classmethod
     def from_xkey(cls, xkey: str):
-        xkey = _b58decode_extened_key(xkey)
+        xkey = _decode_base58(xkey, length=82) # (xprv have 82 bytes)
 
         checksum = xkey[-4:]
         xkey = xkey[:-4]
@@ -197,7 +198,7 @@ class KeyChain:
         xkey += hashed_xkey[:4]
 
         # Return base58
-        return _b58encode_extended_key(xkey)
+        return _encode_base58(xkey)
 
     @property
     def xprv(self) -> str:
@@ -206,6 +207,14 @@ class KeyChain:
     @property
     def xpub(self) -> str:
         return self.serialization(KeyType.PUBLIC)
+
+    @property
+    def address(self) -> str:
+        return _pubkey_to_address(self.pubkey, testnet=self.testnet)
+
+    @property
+    def privkey_wif(self) -> str:
+        return _privkey_to_wif(self.privkey, testnet=self.testnet)
 
     def _get_child_using_privkey(self, steps: list):
         for _, index in enumerate(steps):
