@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
+import os
 import hashlib
 import hmac
 
@@ -87,6 +88,17 @@ def _parse_str_path_as_index_list(path: str) -> list[int]:
         else:
             index_list.append(int(step))
     return index_list
+
+
+def _parse_index_list_as_str_path(ixs: list) -> str:
+    result = 'm'
+    for ix in ixs:
+        if ix >= HARDENED_INDEX:
+            path_index = str(ix-HARDENED_INDEX) +  'h'
+        else:
+            path_index = str(ix)
+        result += f'/{path_index}'
+    return result
 
 
 @dataclass(frozen=True)
@@ -274,3 +286,33 @@ class KeyChain:
             child = self
 
         return child
+
+    def export_addresses_from_path(self, path: str, n: int = 20,
+                                   export_to_file: bool = True,
+                                   bip38_password: str = None) -> str:
+        steps = _parse_str_path_as_index_list(path)
+        multipath = []
+        for i in range(n):
+            ixpath = steps.copy()
+            ixpath[-1] += i
+            path = _parse_index_list_as_str_path(ixpath)
+            child = self.derive_child_from_path(path)
+            multipath.append({
+                'path': path,
+                'address': child.address,
+                'public_key': child.pubkey.hex(),
+                'private_key': child.privkey_wif
+            })
+
+        columns = ['path', 'address', 'public_key', 'private_key']
+        result = ','.join(columns)
+        for key in multipath:
+            result += '\n' + ','.join([key.get(column) for column in columns])
+
+        if export_to_file:
+            current = os.path.dirname(__file__)
+            file_path = os.path.join(current, '..', 'user', 'addresses.csv')
+            with open(file_path, 'w') as f:
+                f.write(result)
+
+        return result
