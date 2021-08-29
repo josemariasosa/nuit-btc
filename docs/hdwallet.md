@@ -30,5 +30,28 @@ Para generar una dirección se utiliza el algoritmo conocido comúnmente como `H
 
 ## Carteras de Bitcoin
 
+La administración de nuestros fondos sería muy sencilla, si de la misma manera que reutilizamos nuestro correo electrónico, utilizáramos una y otra vez la misma dirección para recibir y transferir fondos. Pues así, únicamente tendríamos que preocuparnos de mantener segura una sola llave privada.
+
+Sin embargo, este modelo no es muy recomendable por la siguiente razón. Como ya vimos, una dirección **(A)** de Bitcoin está protegida por 2 capas de encriptación, por tanto, si un adversario quisiera robar los fondos de una dirección, primero tendría que romper la encriptación provista por el algoritmo `HASH160` para obtener la llave pública y posteriormente tendría que romper la encriptación de `ECDSA` para obtener la llave privada.
+
+Al momento de generar una transacción, para gastar los fondos presentes en una dirección, como lo solicita el [Pay-to-Public-Key-Hash (P2PKH)](), es necesario revelar a la red pública que el usuario es dueño de la llave pública que apunta a dicha dirección. Si, en lugar de generar una nueva dirección, reutilizamos aquella de la cual hemos revelado la llave pública, un adversario tendría que romper sólo la encriptación del algoritmo `ECDSA` para robar los fondos. A la fecha, esto sigue siendo computacionalmente imposible.
+
+Además de esta vulnerabilidad, la privacidad del dueño de la dirección podría verse comprometida pues todos los fondos que se muevan podrán ser fácilmente triangulados mediante un análisis de la información en la Blockchain. 
+
+Por esta razón, es una buena práctica generar una nueva, y fresca ❄️, dirección de Bitcoin cada vez que se vayan a recibir fondos.
+
+<p align="center">
+    <img src="/media/wallet_simple.jpg?raw=true" width="600">
+</p>
+
+deterministica:
+
+<p align="center">
+    <img src="/media/wallet_deterministic.jpg?raw=true" width="600">
+</p>
 
 En inglés se conocen como *Hierarchical Deterministic wallets*, o simplemente HD wallets.
+
+<p align="center">
+    <img src="/media/wallet_hd.jpg?raw=true" width="600">
+</p>
