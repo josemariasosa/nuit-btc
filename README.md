@@ -16,8 +16,11 @@ Para la implementación del algoritmo criptográfico de curva elíptica (ECDSA) 
 - [Generación de palabras mnemónicas (BIP-39)](/docs/mnemonic.md)
 - [Generación de llaves extendidas (BIP-32)](/docs/extended_key.md)
 
-![La Nuit](/media/la_nuit.jpg?raw=true)
+
+<p align="center">
+    <img src="/media/la_nuit.jpg?raw=true" height="600" width="600">
+</p>
 
 ```
-Porque la Nuit también quiere tener sus bitcoins guardados de manera segura.
+Porque la Nuit también quiere tener sus satoshis guardados de manera segura.
 ```
