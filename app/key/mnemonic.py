@@ -149,15 +149,18 @@ class Mnemonic():
         ).hex().zfill(128)
         return stretched
 
-    def generate_user_keys(self, manully: bool = False,
+    def generate_user_keys(self, manually: bool = False,
                            passphrase: str = '') -> dict[str, str]:
-        entropy = self.generate_entropy(manually=False)
+        entropy = self.generate_entropy(manually)
         checksum = self.generate_checksum(entropy)
 
         full = entropy + checksum
         mnemonic = self.to_mnemonic(full)
         seed = self.to_seed(mnemonic, passphrase)
 
-        print('entropy:', entropy)
-        print('mnemonic:', mnemonic)
-        print('seed:', seed)
+        return {
+            'entropy': entropy,
+            'mnemonic': mnemonic,
+            'passphrase': passphrase,
+            'seed': seed
+        }
