@@ -23,9 +23,9 @@ Llave privada    -- ECDSA -->    Llave pública    -- HASH160 -->    Dirección
                  <---  X  ---                     <----  X  ----
 ```
 
-El algoritmo [criptográfico de curva elíptica (ECDSA)]() permite generar una llave pública a partir de una llave privada, y además permite firmar digitalmente transacciones, comprobando que el firmante es poseedor del secreto.
+El algoritmo [criptográfico de curva elíptica (ECDSA)](https://github.com/josemariasosa/nuit-btc/blob/master/docs/crypto.md#criptograf%C3%ADa-de-curva-el%C3%ADptica-ecdsa) permite generar una llave pública a partir de una llave privada, y además permite firmar digitalmente transacciones, comprobando que el firmante es poseedor del secreto.
 
-Para generar una dirección se utiliza el algoritmo conocido comúnmente como `HASH160` el cual consta de una operación de doble de hash de una llave pública **(K)**, primero utilizando `SHA256` seguido de un `RIPEMD160`. Finalmente, para obtener una dirección con el formato correcto de una dirección de Bitcoin el hash se codifica mediante [**Base58Check**]().
+Para generar una dirección se utiliza el algoritmo conocido comúnmente como `HASH160` el cual consta de una operación de doble de hash de una llave pública **(K)**, primero utilizando `SHA256` seguido de un `RIPEMD160`. Finalmente, para obtener una dirección con el formato correcto de una dirección de Bitcoin el hash se codifica mediante [Base58Check](https://github.com/josemariasosa/nuit-btc/blob/master/docs/crypto.md#codificaci%C3%B3n-base58check).
 
 
 ## Carteras de Bitcoin
