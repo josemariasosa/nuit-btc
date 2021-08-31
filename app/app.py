@@ -5,15 +5,25 @@ from key.mnemonic import Mnemonic
 from key.keychain import KeyChain
 
 from crypto.ecdsa.secp256k1 import PrivateKey
+from key.bip38 import bip38
 
 def main():
-    m = Mnemonic(language="spanish", number_of_words=12)
-    secret = m.generate_user_keys(manually=True)
+    # m = Mnemonic(language="spanish", number_of_words=12)
+    # secret = m.generate_user_keys(manually=True)
 
-    print('mnemonic: ', secret.get('mnemonic'))
-    print('seed: ', secret.get('seed'))
+    # print('mnemonic: ', secret.get('mnemonic'))
+    # print('seed: ', secret.get('seed'))
 
+    # exit()
+    bip38()
     exit()
+
+
+    print('address: ', child.address)
+    print('pubkey: ', child.pubkey.hex())
+    print('privkey: ', child.privkey_wif)
+    exit()
+
 
     # # mnemonic = 'weekend breeze child puppy detail assault input wish bubble junior mention destroy'
     # # seed = m.to_seed(mnemonic)

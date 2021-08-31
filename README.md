@@ -5,7 +5,9 @@ Implementación de una **Cartera Jerárquica Determinista** para Bitcoin (BTC).
 
 La implementación será llevada a cabo en Python, y estará acompañada de una documentación extensa en Español, con el objetivo de que pueda servir como guía para  personas interesadas en aprender o desarrolar software propio.
 
-El **objetivo** de esta implementación es principalmente didáctico. Cada operación será realizada utilizando únicamente la librería base de Python, sin módulos externos. Con el fin de que los interesados puedan comprender, con un gran nivel de detalle, cómo es que se genera cada bit, dentro de una cartera, de una llave y/o una transacción en Bitcoin. Eliminando la presencia de procesos oscuros, o de caja negra, transparentando así cada paso.
+El **objetivo** de esta implementación es principalmente didáctico. Cada paso será explicado en la documentación.
+
+<!-- Cada operación será realizada utilizando únicamente la librería base de Python, sin módulos externos. Con el fin de que los interesados puedan comprender, con un gran nivel de detalle, cómo es que se genera cada bit, dentro de una cartera, de una llave y/o una transacción en Bitcoin. Eliminando la presencia de procesos oscuros, o de caja negra, transparentando así cada paso. -->
 
 Para la implementación del algoritmo [criptográfico de curva elíptica (ECDSA)](https://github.com/josemariasosa/nuit-btc/blob/master/docs/crypto.md#criptograf%C3%ADa-de-curva-el%C3%ADptica-ecdsa) en Python se utilizó como referencia el libro de [**Programming Bitcoin**](https://github.com/jimmysong/programmingbitcoin) de Jimmy Song.
 

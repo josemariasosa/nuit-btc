@@ -4,12 +4,24 @@
 import re
 import hashlib
 import hmac
+import unicodedata
 
 from crypto.ecdsa.secp256k1 import N, G, S256Point, PrivateKey
 
 ZERO = b'\x00'
 HARDENED_INDEX = (2 ** 32) // 2
 REGEX_DERIVATION_PATH = re.compile("^m(/[0-9]+['hH]?)*$")
+
+
+def _normalize_string(txt: str, form: str = 'NFKD') -> str:
+    if isinstance(txt, bytes):
+        utxt = txt.decode('utf8')
+    elif isinstance(txt, str):
+        utxt = txt
+    else:
+        raise TypeError('String value expected')
+
+    return unicodedata.normalize(form, utxt)
 
 
 def _generate_public_key(private_key: bytes) -> bytes:

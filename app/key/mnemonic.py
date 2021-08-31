@@ -6,7 +6,7 @@ import hashlib
 import secrets
 import unicodedata
 
-from typing import AnyStr
+from key.utils import _normalize_string
 
 PBKDF2_ROUNDS = 2048
 FAIR_DICE = ['1', '2', '3', '4', '5', '6']
@@ -22,17 +22,6 @@ class Mnemonic():
                 'El número permitido de palabras mnemónicas (BIP39) debe ser [12, 15, 18, 21, 24]'
             )
         self.number_of_words = number_of_words
-
-    @staticmethod
-    def normalize_string(txt: AnyStr) -> str:
-        if isinstance(txt, bytes):
-            utxt = txt.decode('utf8')
-        elif isinstance(txt, str):
-            utxt = txt
-        else:
-            raise TypeError('String value expected')
-
-        return unicodedata.normalize('NFKD', utxt)
 
     @staticmethod
     def _get_directory() -> str:
@@ -139,8 +128,8 @@ class Mnemonic():
 
     @classmethod
     def to_seed(cls, mnemonic: str, passphrase: str = '') -> str:
-        mnemonic = cls.normalize_string(mnemonic)
-        passphrase = cls.normalize_string(passphrase)
+        mnemonic = _normalize_string(mnemonic, form='NFKD')
+        passphrase = _normalize_string(passphrase, form='NFKD')
         passphrase = 'mnemonic' + passphrase
         mnemonic_bytes = mnemonic.encode('utf-8')
         passphrase_bytes = passphrase.encode('utf-8')
