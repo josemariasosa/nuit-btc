@@ -4,7 +4,6 @@
 import os
 import hashlib
 import secrets
-import unicodedata
 
 from key.utils import _normalize_string
 
