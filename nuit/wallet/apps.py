@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class KeychainConfig(AppConfig):
+class WalletConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'keychain'
+    name = 'wallet'
