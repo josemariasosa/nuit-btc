@@ -1,0 +1,28 @@
+{% extends "wallet/base.html" %}
+
+{% block title %}Nuit BTC Wallet - Crear una frase mnemonica.{% endblock %}
+
+{% block content %}
+  <h1>Nuit BTC Wallet - Crear una frase mnemonica.</h1>
+
+  <p>Para generar una llave nueva, es necesario ingresar entropia. Seleccione una fuente de entropia.</p>
+  <form method="post">
+    {{ mnemonic_form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Crear frase">
+  </form>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $('.my-buttons').click(function() {
+      var value = $(".dice_entropy").val()
+      var clicked_button = $(this).attr('value')
+      //use val and combined both value
+      $(".dice_entropy").val(value + "" + clicked_button);
+
+    });
+  </script>
+  <button value="7" class="my-buttons" type="button"> 7 </button>
+  <button value="10" class="my-buttons" type="button"> 10 </button>
+  <button value="6" class="my-buttons" type="button"> 6 </button>
+{% endblock %}
+

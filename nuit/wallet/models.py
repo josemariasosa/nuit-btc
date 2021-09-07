@@ -11,7 +11,6 @@ class KeyChain(models.Model):
     depth = models.IntegerField()
     index = models.IntegerField()
     testnet = models.BooleanField()
-
     path = models.CharField(max_length=10)
 
     class Meta:
@@ -38,3 +37,4 @@ class Account(models.Model):
 
     def __str__(self):
         return f'Account #{self.index}: {self.name}'
+
