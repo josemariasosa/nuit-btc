@@ -1,0 +1,13 @@
+{% extends "wallet/base.html" %}
+
+{% block title %}Nuit BTC Wallet{% endblock %}
+
+{% block content %}
+  <h1>Nuit BTC Wallet</h1>
+  <h2>Bienvenido a su wallet favorita.</h2>
+
+  <p>Seleccione una opcion:</p>
+  <p> <a href="{% url "wallet:create_mnemonics" %}">1. Crear una llave nueva.</a> </p>
+  <p> <a href="{% url "wallet:load_mnemonics" %}">2. Cargar mis palabras mnemonicas.</a> </p>
+{% endblock %}
+

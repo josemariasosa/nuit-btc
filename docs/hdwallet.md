@@ -1,5 +1,11 @@
 # Cartera Jerárquica Deterministica
 
+Una **Cartera Jerárquica Deterministica** es una pieza de Software que nos permite administrar de manera simple y segura un número `n` de llaves. Es importante comprender que los bitcoins nunca van a trasladarse hacia nuestra cartera, o hacia ninguna otra. Las monedas siempre se van a quedar en la cadena de bloques, y nosotros solamente somos dueños de las llaves que permiten desbloquearlas.
+
+Una analogía muy útil, es pensar en la blockchain de manera similar a los lóckers de una estación de tren. Los bitcoins jamás van a salir de la estación, y nosotros tenemos el control de la llave para abrir el lócker y mover la moneda hacia otro lócker que tenga una llave distinta asociada. Esta llave puede estar también bajo nuestro poder, o en poder de alguien más.
+
+Dentro de esta analogía, una cartera funciona más como un llavero que nos permite administrar todas las llaves de los lócker donde tenemos monedas almacenadas. Pero también, de todos aquellos lóckers vacíos que están a nuestra disposición para recibir nuevas monedas.
+
 
 ## Direcciones, Llaves Públicas y Privadas
 
